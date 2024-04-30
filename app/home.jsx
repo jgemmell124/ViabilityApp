@@ -6,6 +6,8 @@ import { Link, Stack } from 'expo-router';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
+import DeviceInfo from '../components/DeviceInfo';
+import { ScrollView } from 'react-native';
 
 export default function HomeScreen() {
 
@@ -14,6 +16,9 @@ export default function HomeScreen() {
 
   const devices = [
     { id: 1, name: 'Device 1', status: 'Active', temp: '54' },
+    { id: 2, name: 'Device 2', status: 'Inactive', temp: '54' },
+    { id: 3, name: 'Device 3', status: 'Active', temp: '30' },
+    { id: 4, name: 'Device 4', status: 'Inactive', temp: '54' },
   ]
 
   return (
@@ -50,9 +55,19 @@ export default function HomeScreen() {
           ),
         }}
       />
-      <Text style={styles.title}>Devices ({devices.length})</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/home.tsx" />
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={styles.title}>Devices ({devices.length})</Text>
+        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        {devices.map((device) => (
+          <DeviceInfo key={device.id} device={device} />
+        ))}
+        <EditScreenInfo path="app/home.tsx" />
+      </ScrollView>
     </View>
   );
 }
@@ -69,7 +84,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   separator: {
-    marginVertical: 30,
+    marginVertical: 4,
     height: 1,
     width: '80%',
   },
