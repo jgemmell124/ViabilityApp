@@ -56,10 +56,12 @@ export default function HomeScreen() {
         }}
       />
       <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: 'center',
           width: '100%',
+          paddingBottom: 10,
         }}
       >
         <Text style={styles.title}>Devices ({devices.length})</Text>
