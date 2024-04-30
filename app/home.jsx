@@ -11,6 +11,11 @@ export default function HomeScreen() {
 
   const colorScheme = useColorScheme();
 
+
+  const devices = [
+    { id: 1, name: 'Device 1', status: 'Active', temp: '54' },
+  ]
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -45,7 +50,7 @@ export default function HomeScreen() {
           ),
         }}
       />
-      <Text style={styles.title}>Home Page</Text>
+      <Text style={styles.title}>Devices ({devices.length})</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <EditScreenInfo path="app/home.tsx" />
     </View>
@@ -56,10 +61,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    /* justifyContent: 'center', */
   },
   title: {
-    fontSize: 20,
+    paddingTop: 5,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   separator: {
