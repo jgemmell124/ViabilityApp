@@ -59,6 +59,7 @@ export default function HomeScreen() {
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: 'center',
+          width: '100%',
         }}
       >
         <Text style={styles.title}>Devices ({devices.length})</Text>
@@ -66,7 +67,7 @@ export default function HomeScreen() {
         {devices.map((device) => (
           <DeviceInfo key={device.id} device={device} />
         ))}
-        <EditScreenInfo path="app/home.tsx" />
+        {/* <EditScreenInfo path="app/home.tsx" /> */}
       </ScrollView>
     </View>
   );
@@ -75,8 +76,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    /* justifyContent: 'center', */
+    /* alignItems: 'center', */
   },
   title: {
     paddingTop: 5,
