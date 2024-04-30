@@ -1,4 +1,6 @@
 import { Text, View } from '@/components/Themed';
+import { Link } from 'expo-router';
+import { Pressable } from 'react-native';
 import { Card, Button } from 'react-native-paper';
 
 export default function DeviceInfo({ device }) {
@@ -25,7 +27,19 @@ export default function DeviceInfo({ device }) {
         <Text>Temperature: {device.temp}°C</Text>
       </Card.Content>
       <Card.Actions>
-        <Button>Cancel</Button>
+        <Link
+          href={{
+            pathname: '/device',
+            params: { name: device.name ?? 'foo' },
+          }} 
+          asChild
+        >
+          <Pressable>
+            {({ pressed }) => (
+              <Text style={{ color: pressed ? 'grey' : 'blue' }}>View Details</Text>
+            )}
+          </Pressable>
+        </Link>
         <Button>Ok</Button>
       </Card.Actions>
     </Card>
