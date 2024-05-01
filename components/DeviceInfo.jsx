@@ -1,9 +1,11 @@
 import { Text, View } from '@/components/Themed';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { Card, Button } from 'react-native-paper';
 
 export default function DeviceInfo({ device }) {
+
+  const router = useRouter();
 
   return (
     <Card
@@ -27,6 +29,13 @@ export default function DeviceInfo({ device }) {
         <Text>Temperature: {device.temp}°C</Text>
       </Card.Content>
       <Card.Actions>
+        <Button
+          onPress={() => {
+            router.push(`/device/${device.name}`, { params: device });
+          }}
+        >
+          Details
+        </Button>
         <Link
           href={{
             pathname: '/device',

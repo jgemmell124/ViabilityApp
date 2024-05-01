@@ -6,7 +6,7 @@ import { useRouter, useLocalSearchParams, useSearchParams } from 'expo-router';
 
 export default function DeviceScreen() {
   const router = useRouter();
-  const { name } = useLocalSearchParams();
+  const device = useLocalSearchParams();
 
 
   return (
@@ -14,7 +14,7 @@ export default function DeviceScreen() {
       <Text style={styles.title}>Device Details</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Text>
-        This is your device {name ?? 'hello'}
+        This is your device {device?.name ?? 'hello'}
       </Text>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
