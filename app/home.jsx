@@ -6,7 +6,7 @@ import { Link, Stack } from 'expo-router';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import DeviceInfo from '../components/DeviceInfo';
+import DeviceInfoCard from '../components/DeviceInfo';
 import { ScrollView } from 'react-native';
 
 export default function HomeScreen() {
@@ -15,10 +15,13 @@ export default function HomeScreen() {
 
 
   const devices = [
-    { id: 1, name: 'Device 1', status: 'Active', temp: '54' },
-    { id: 2, name: 'Device 2', status: 'Inactive', temp: '54' },
-    { id: 3, name: 'Device 3', status: 'Active', temp: '30' },
-    { id: 4, name: 'Device 4', status: 'Inactive', temp: '54' },
+    { id: 1, name: 'Device 1', status: 'Active', temp: '54', battery: 20 },
+    { id: 2, name: 'Device 2', status: 'Inactive', temp: '54', battery: 55 },
+    { id: 3, name: 'Device 3', status: 'Active', temp: '30', battery: 100 },
+    { id: 4, name: 'Device 4', status: 'Inactive', temp: '54', battery: 89 },
+    { id: 5, name: 'Device 5', status: 'Active', temp: '54', battery: 10 },
+    { id: 6, name: 'Device 6', status: 'Inactive', temp: '54', battery: 1 },
+    { id: 7, name: 'Device 7', status: 'Inactive', temp: '54', battery: 0 },
   ]
 
   return (
@@ -64,10 +67,10 @@ export default function HomeScreen() {
           paddingBottom: 10,
         }}
       >
-        <Text style={styles.title}>Devices ({devices.length})</Text>
+        <Text style={styles.title}>My Devices ({devices.length})</Text>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         {devices.map((device) => (
-          <DeviceInfo key={device.id} device={device} />
+          <DeviceInfoCard key={device.id} device={device} />
         ))}
         {/* <EditScreenInfo path="app/home.tsx" /> */}
       </ScrollView>
