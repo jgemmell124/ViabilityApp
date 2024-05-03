@@ -167,6 +167,31 @@ export default function DeviceInfoCard({ device }) {
           </View>
         </View>
       </Card.Content>
+      {/* Estimated time */}
+      {/* TODO: Add the estimated time of safe temperature instead of hardcode */}
+      <Card.Content
+        style={{
+          paddingTop: 10,
+        }}
+      >
+        <View>
+          <Text
+            variant='titleSmall'
+          >
+            Estimated Time of safe temperature:
+          </Text>
+          <Text
+            variant='titleSmall'
+            style={{ 
+              justifyContent: 'flex-start',
+              color: 'red',
+            }}
+          >
+            <FontAwesome name='warning' /> 3 hours 10 minutes
+          </Text>
+        </View>
+      </Card.Content>
+      {/* Last Contact */}
       <Card.Content 
         style={{ 
           padding: 10,
@@ -188,7 +213,7 @@ export default function DeviceInfoCard({ device }) {
               color: `${device.status === 'Active' ? 'green' : 'red'}`
             }}
           >
-            {(new Date()).toString().split(' ').slice(0, 5).join(' ')}
+            {(new Date()).toString().split(' ').slice(0, 5).join(' ')} (2 hours ago)
           </Text>
         </View>
       </Card.Content>
