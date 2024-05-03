@@ -1,8 +1,9 @@
-import { Text, View } from '@/components/Themed';
+/* import { View } from '@/components/Themed'; */
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
-import { Card, Button } from 'react-native-paper';
+import { Card, Button, Text } from 'react-native-paper';
+import { View } from 'react-native';
 
 export default function DeviceInfoCard({ device }) {
 
@@ -18,7 +19,7 @@ export default function DeviceInfoCard({ device }) {
       batteryColor = 'green';
       batteryIcon = 'battery-three-quarters';
     } else if (battery > 25) {
-      batteryColor = 'yellow';
+      batteryColor = 'blue';
       batteryIcon = 'battery-half';
     } else if (battery >= 10) {
       batteryColor = 'orange';
@@ -37,7 +38,7 @@ export default function DeviceInfoCard({ device }) {
       connectionColor = 'green';
       connectionIcon = 'signal-cellular-3';
     } else if (connection > 33) {
-      connectionColor = 'yellow';
+      connectionColor = 'blue';
       connectionIcon = 'signal-cellular-2';
     } else if (connection > 0) {
       connectionColor = 'orange';
@@ -52,12 +53,38 @@ export default function DeviceInfoCard({ device }) {
   const { batteryIcon, batteryColor } = getBatteryIconAndColor(device.battery);
   const { connectionIcon, connectionColor } = getConnectionIconAndColor(device.battery);
 
+  const cardHeader = (
+    <View 
+      style={{
+        backgroundColor: 'green',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+      }}
+    >
+      <Text 
+        style={{
+          color: 'white',
+        }}
+      >
+        {device.name}
+      </Text>
+      <View style={{ flexGrow: 1 }} />
+      <Text 
+        style={{
+          color: 'red',
+        }}
+        variant='titleSmall'>
+        {device.temp}
+      </Text>
+    </View>
+  );
+
+
   return (
     <Card
       style={{
         width: '90%',
         margin: 5,
-        padding: 5,
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: {
@@ -68,42 +95,103 @@ export default function DeviceInfoCard({ device }) {
         shadowRadius: 3.84,
         elevation: 5,
       }}
+      onPress={() => {
+        router.push({
+          pathname: '/device',
+          params: { name: device.name ?? 'foo' },
+        });
+      }}
     >
-      <Card.Title title={device.name} subtitle={device.status} />
-      <Card.Content>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Text>
+      <Card.Title
+        title={device.name}
+        titleStyle={{ fontSize: 20 }}
+        subtitle={device.status}
+        right={(props) => 
+          <Text
+            style={{
+              alignSelf: 'flex-end',
+              marginTop: -30,
+              paddingRight: 10,
+            }}
+          >
             <FontAwesome name={batteryIcon} color={batteryColor} /> {device.battery}%
+            {' '}<MaterialCommunityIcons name={connectionIcon} color={connectionColor} />
           </Text>
-          <View style={{ width: 10 }} />
-          <Text>
-            {' '}<MaterialCommunityIcons adjustsFontSizeToFit  name={connectionIcon} color={connectionColor} />
+        }
+      />
+      <Card.Content
+        style={{
+          flexDirection: 'row',
+          alignContent: 'center',
+          justifyContent: 'space-evenly',
+          padding: 4,
+        }}
+      >
+        {/* Display the temp */}
+        <Text
+          variant='headlineLarge'
+          style={{
+            color: 'green',
+          }}
+        >
+          {`${device.temp} °F`}
+        </Text>
+        {/* display the threshold */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text
+            style={{
+              marginRight: 10,
+            }}
+            variant='labelLarge'
+          >
+            Threshold:
+          </Text>
+          <View
+            style={{
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <Text variant='labelMedium'>
+              Min: 32°F
+            </Text>
+            <Text variant='labelMedium'>
+              Max: 100°F
+            </Text>
+          </View>
+        </View>
+      </Card.Content>
+      <Card.Content 
+        style={{ 
+          padding: 10,
+          margin: 0,
+          justifyContent: 'space-between',
+          flexDirection: 'row',
+        }}
+      >
+        <View>
+          <Text
+            variant='titleSmall'
+          >
+            Last Contact:
+          </Text>
+          <Text
+            variant='titleSmall'
+            style={{ 
+              justifyContent: 'flex-start',
+              color: `${device.status === 'Active' ? 'green' : 'red'}`
+            }}
+          >
+            {(new Date()).toString().split(' ').slice(0, 5).join(' ')}
           </Text>
         </View>
       </Card.Content>
-      <Card.Actions>
-        <Button
-          onPress={() => {
-            router.push(`/device/${device.name}`, { params: device });
-          }}
-        >
-          Details
-        </Button>
-        <Link
-          href={{
-            pathname: '/device',
-            params: { name: device.name ?? 'foo' },
-          }} 
-          asChild
-        >
-          <Pressable>
-            {({ pressed }) => (
-              <Text style={{ color: pressed ? 'grey' : 'blue' }}>View Details</Text>
-            )}
-          </Pressable>
-        </Link>
-        <Button>Ok</Button>
-      </Card.Actions>
     </Card>
   )
 };
