@@ -97,7 +97,7 @@ export default function DeviceInfoCard({ device }) {
       }}
       onPress={() => {
         router.push({
-          pathname: '/device',
+          pathname: '/(device)/device',
           params: { name: device.name ?? 'foo' },
         });
       }}
