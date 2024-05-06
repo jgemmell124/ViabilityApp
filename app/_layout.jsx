@@ -7,6 +7,10 @@ import { useEffect } from 'react';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { Provider } from 'react-redux';
+
+import { store } from '@/state/store';
+import { requestPermissions } from '@/state/BluetoothLowEnergy/utils';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -37,6 +41,10 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    requestPermissions();
+  }, [])
 
   if (!loaded) {
     return null;
@@ -95,11 +103,13 @@ function RootLayoutNav() {
   };
 
   return (
-    <PaperProvider theme={theme}>
+    <Provider store={store}>
+      <PaperProvider theme={theme}>
         <Stack
           screenOptions={{
             headerShown: true,
           }}
+          initialRouteName='index'
         >
           {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
           <Stack.Screen name="index" options={{ headerShown: true }} />
@@ -107,6 +117,7 @@ function RootLayoutNav() {
           <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
           <Stack.Screen name="(device)" options={{ headerShown: false }} />
         </Stack>
-    </PaperProvider>
+      </PaperProvider>
+    </Provider>
   );
 }

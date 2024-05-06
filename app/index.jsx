@@ -2,30 +2,79 @@ import { StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Stack, useNavigation } from 'expo-router';
 
-import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import DeviceInfoCard from '../components/DeviceInfo';
-import { ScrollView, View } from 'react-native';
-import { IconButton, Text, useTheme } from 'react-native-paper';
-import log from '@/assets/images/VIAbility_logo.png';
+import DeviceInfoCard from '../components/DeviceInfoCard';
+import { ScrollView, View, Animated } from 'react-native';
+import { Icon, IconButton, Text, useTheme } from 'react-native-paper';
 import Separator from '../components/Seperator';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectConnectedDevices, selectDevices } from '../state/store';
+import { startListening, startScanning, stopScanning } from '@/state/BluetoothLowEnergy/slice';
+import { useEffect, useRef, useState } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import log from '@/assets/images/VIAbility_logo.png';
+import { isLoading } from 'expo-font';
+import { connectToDevice } from '@/state/BluetoothLowEnergy/listener';
 const logoUri = Image.resolveAssetSource(log).uri;
 
 export default function HomeScreen() {
-
+  const [isSearching, setIsSearching] = useState(false);
+  const timeoutRef = useRef(null);
   const colorScheme = useColorScheme();
   const theme = useTheme();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  const devices = [
-    { id: 1, name: 'Device 1', status: 'Active', temp: '54', battery: 20 },
-    { id: 2, name: 'Device 2', status: 'Inactive', temp: '54', battery: 55 },
-    { id: 3, name: 'Device 3', status: 'Active', temp: '30', battery: 100 },
-    { id: 4, name: 'Device 4', status: 'Inactive', temp: '54', battery: 89 },
-    { id: 5, name: 'Device 5', status: 'Active', temp: '54', battery: 10 },
-    { id: 6, name: 'Device 6', status: 'Inactive', temp: '54', battery: 1 },
-    { id: 7, name: 'Device 7', status: 'Inactive', temp: '54', battery: 0 },
-  ]
+  const devices =  useSelector(selectDevices);
+  const connectedDevices = useSelector(selectConnectedDevices);
+
+  const spinValue = new Animated.Value(0);
+  const rotate = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg']
+
+  })
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
+
+  useEffect(() => {
+    // autoconnect to the devices recognized (if not connected);
+    console.log('connected to devices');
+    const unconnectedDevices = devices.filter(device => !connectedDevices.includes(device.id));
+    for (const device of unconnectedDevices) {
+      console.log('attempting to connect', device.id);
+      dispatch(connectToDevice(device));
+    }
+
+  }, [devices]);
+
+
+  useEffect(() => {
+      for (const device of connectedDevices) {
+        dispatch(startListening());
+        console.log('listening');
+      }
+  }, [connectedDevices]);
+
+  const spin = () => {
+    spinValue.setValue(0);
+    Animated.timing(
+      spinValue,
+      {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true
+      }
+    ).start(() => spin());
+  }
+
+  if (isSearching) {
+    spin();
+  }
+
 
   const LogoTitle = () => {
     return (
@@ -33,13 +82,43 @@ export default function HomeScreen() {
     );
   }
 
+  const stopDeviceScanTimeout = () => {
+    return setTimeout(() => {
+      setIsSearching(false);
+      dispatch(stopScanning());
+    }, 8000);
+  }
+
+
+  const onAddDevice = () => {
+    if (!isSearching) {
+      dispatch(startScanning());
+      timeoutRef.current = stopDeviceScanTimeout();
+    }
+    setIsSearching(!isSearching);
+  };
+
+  const onStopScanning = () => {
+    clearTimeout(timeoutRef.current);
+    setIsSearching(false);
+    dispatch(stopScanning());
+  }
+
+  /**/
+  /* if (devices?.length > 0) { */
+  /*   // connect to the first device */
+  /*   const firstDevice = devices[0]; */
+  /*   dispatch(connectToDevice(firstDevice.id)); */
+  /* } */
+
+
   const HeaderLeftIcon = () => {
     return (
       <IconButton
         icon="cog"
         size={25}
         animated
-        onPressOut={() => navigation.navigate('settings')}
+        onPress={() => navigation.navigate('settings')}
         style={{
           marginLeft: 0,
           paddingLeft: 0,
@@ -50,18 +129,35 @@ export default function HomeScreen() {
 
   const HeaderRightIcon = () => {
     return (
-      <Pressable>
+      <>
+        <Animated.View style={{ transform: [{ rotate }]}}>
+          <MaterialCommunityIcons
+            name='sync'
+            size={24}
+            style={{
+              color: isSearching ? theme.colors.primary : 'transparent'
+            }}
+          />
+        </Animated.View>
         <IconButton
           icon={'plus'}
           size={25}
           animated
-          onPress={() => console.log('Add Device')}
+          onPress={() => {
+            if (isSearching) {
+              onStopScanning();
+            } else {
+              onAddDevice();
+            }
+          }}
+          iconColor={isSearching ? theme.colors.error : 'black' }
           style={{
+            transform: [{ rotate: isSearching ? '45deg' : '0deg' }],
             marginRight: 0,
             paddingRight: 0,
           }}
         />
-      </Pressable>
+      </>
     )
   }
 
@@ -86,9 +182,15 @@ export default function HomeScreen() {
       >
         <Text style={styles.title}>My Devices ({devices.length})</Text>
         <Separator style={styles.separator} />
-        {devices.map((device) => (
-          <DeviceInfoCard key={device.id} device={device} />
-        ))}
+        {
+          devices.map((device) => (
+            <DeviceInfoCard
+              navigation={navigation}
+              key={device.id}
+              device={device}
+            />
+          ))
+        }
       </ScrollView>
     </View>
   );

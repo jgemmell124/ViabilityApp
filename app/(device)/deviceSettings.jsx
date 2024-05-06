@@ -6,10 +6,19 @@ import { Text, Button, Card, Dialog, Portal, TextInput, useTheme } from 'react-n
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteDevice } from '@/state/BluetoothLowEnergy/slice';
+import { selectDeviceById } from '@/state/store';
+import { disconnectFromDevice } from '@/state/BluetoothLowEnergy/listener';
 
 export default function DeviceSettingsScreen() {
-  const device = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const device = useSelector(selectDeviceById(id));
+
 
   const theme = useTheme();
 
@@ -19,12 +28,37 @@ export default function DeviceSettingsScreen() {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
+  const onDelete = () => {
+    dispatch(disconnectFromDevice(device));
+    navigation.navigate('index');
+  }
+
   const editFields = [
-    { name: 'Name', value: device.name },
+    { name: 'Name', value: device?.name ?? 'some name' },
     { name: 'Location', value: device.loc ?? 'living room' },
     { name: 'Max Temp', value: device.loc ?? '100' },
     { name: 'Min Temp', value: device.loc ?? '23' },
   ];
+
+  const textHeader = (text) => (
+    <View
+      style={{
+        margin: 6,
+        width: '100%',
+        /* backgroundColor: '#f0f0f0', */
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: 'bold',
+        }}>
+        {text}
+      </Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -33,8 +67,7 @@ export default function DeviceSettingsScreen() {
           title: `${device.name} Settings`,
         }}
       />
-      <Text style={styles.title}>Device Settings</Text>
-      <View style={styles.separator} />
+      {textHeader('Device Settings')}
       <View style={{ marginTop: 0, marginBottom: 10, width: '100%' }}>
         <Card
           style={{
@@ -42,6 +75,7 @@ export default function DeviceSettingsScreen() {
             borderRadius: 0,
             /* borderWidth: '80%', */
             /* shadowColor: 'transparent', */
+            borderColor: 'transparent',
           }}
           // TODO: fix this to look more like settings
           mode='outlined'
@@ -53,7 +87,7 @@ export default function DeviceSettingsScreen() {
         >
           {
             editFields.map((field, index) => (
-              <>
+              <View key={index}>
               <TouchableOpacity
                 key={index}
                 onPress={() => {
@@ -70,8 +104,11 @@ export default function DeviceSettingsScreen() {
                   right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
                 />
               </TouchableOpacity>
-              <Separator style={{ alignSelf: 'center', width: '95%' }} />
-              </>
+                {
+                  index < editFields.length - 1 &&
+                  <Separator style={{ alignSelf: 'center', width: '95%' }} />
+                }
+              </View>
             ))
           }
         </Card>
@@ -89,7 +126,7 @@ export default function DeviceSettingsScreen() {
                 mode='outlined'
                 autoFocus
                 value={selectedField?.value}
-                onChangeText={(text) => console.log(text)}
+                onChangeText={(text) => {}}
               />
             </Dialog.Content>
             <Dialog.Actions>
@@ -103,13 +140,12 @@ export default function DeviceSettingsScreen() {
         mode='contained-tonal'
         icon='delete'
         labelStyle={{ color: theme.colors.onError }}
-        onPress={() => console.log('delete device')}
+        onPress={onDelete}
         buttonColor={theme.colors.error}
         style={{
           marginTop: 10,
           width: '90%',
-          borderRadius: 10,
-          color: theme.colors.onError,
+          color: theme.colors.onSecondary,
         }}
       >
         Delete Device
