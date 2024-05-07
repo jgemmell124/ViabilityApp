@@ -5,12 +5,13 @@ import { Stack, Link } from 'expo-router';
 
 import TemperatureChart from '@/components/TemperatureChart';
 
-import { SegmentedButtons } from 'react-native-paper';
+import { Button, SegmentedButtons, Text } from 'react-native-paper';
 
-import { Text, View } from '@/components/Themed';
+import { View } from 'react-native';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useColorScheme } from '@/components/useColorScheme';
+import Separator from '@/components/Seperator';
 import { useRouter, useLocalSearchParams, useSearchParams } from 'expo-router';
 import tempData from '@/constants/temperature';
 
@@ -91,14 +92,7 @@ export default function DeviceScreen() {
         }}
       />
       <Text style={styles.title}>Device Details</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <Text>
-        This is your device {device?.name}
-      </Text>
+      <Separator style={{}} />
       <SafeAreaView style={styles.container}>
         <SegmentedButtons
           value={timeRange.toString()}
@@ -113,6 +107,15 @@ export default function DeviceScreen() {
           timeRange={timeRange}
         />
       </SafeAreaView>
+      <View style={styles.container}>
+        <Button
+          mode='contained-tonal'
+          icon='download'
+          style={styles.button}
+        >
+          Export Data
+        </Button>
+      </View>
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
@@ -123,15 +126,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    width: '100%',
     /* justifyContent: 'center', */
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
   },
+  button: {
+    width: '80%',
+  },
   separator: {
-    marginVertical: 30,
+    marginVertical: 0,
     height: 1,
     width: '80%',
+    backgroundColor: '#eee',
   },
 });

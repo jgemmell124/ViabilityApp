@@ -3,7 +3,7 @@ import { LineChart } from "react-native-chart-kit"
 import { Dimensions } from "react-native";
 import { Rect, Text } from "react-native-svg";
 import { View } from "react-native";
-import { Text as RenderText } from "./Themed";
+import { Text as RenderText } from "react-native-paper";
 
 export default function TemperatureChart({ tempData, timeRange }) {
 
@@ -91,9 +91,11 @@ export default function TemperatureChart({ tempData, timeRange }) {
     barPercentage: 0.5,
   };
 
-  const formatToDateAndTime = (dateString) => {
+  // dispaly year, month, day, hour, minute
+  const formatDateRange = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString()?.split("T")[0] + " " + date.toISOString().split("T")[1].split(".")[0];
+    // dispaly year, month, day, hour, minute
+    return date.toISOString().split("T")[0] + " " + date.toISOString().split("T")[1].split(".")[0];
   };
 
   return (
@@ -117,7 +119,7 @@ export default function TemperatureChart({ tempData, timeRange }) {
         yAxisSuffix="°C"
       />
       <RenderText>
-        {dates[0]} - {dates[dates.length - 1]}
+        {formatDateRange(dates[0])} — {formatDateRange(dates[dates.length - 1])}
       </RenderText>
     </View>
   );
@@ -200,8 +202,8 @@ const Tooltip = ({ x, y, textX, textY, stroke, pointStroke, position }) => {
 };
 
 Tooltip.propTypes = {
-  x: PropTypes.func.isRequired,
-  y: PropTypes.func.isRequired,
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
   height: PropTypes.number,
   stroke: PropTypes.string,
   pointStroke: PropTypes.string,

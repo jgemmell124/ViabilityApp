@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
-
-import { Button, Card, Dialog, Portal, TextInput } from 'react-native-paper';
+import { View, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import Separator from '../../components/Seperator';
+import { Text, Button, Card, Dialog, Portal, TextInput, useTheme } from 'react-native-paper';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
 import { Stack, useLocalSearchParams } from 'expo-router';
 
 export default function DeviceSettingsScreen() {
   const device = useLocalSearchParams();
+
+  const theme = useTheme();
 
   const [visible, setVisible] = useState(false);
   const [selectedField, setSelectedField] = useState();
@@ -34,40 +34,52 @@ export default function DeviceSettingsScreen() {
         }}
       />
       <Text style={styles.title}>Device Settings</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <View style={{ marginTop: 10, marginBottom: 10, width: '100%' }}>
-        {
-          editFields.map((field, index) => (
-            <Card
-              key={index}
-              style={{
-                width: '100%',
-                borderRadius: 0,
-                shadowColor: 'transparent',
-              }}
-              mode='outlined'
-              elevation={0}
-              onPressOut={() => {
-                setSelectedField(field);
-                showDialog();
-              }}
-            >
-              <Card.Title
-                title={field.name}
-                titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-                subtitle={field.value}
-                subtitleStyle={{ color: 'gray' }}
-                rightStyle={{marginRight: 10}}
-                right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
-              />
-            </Card>
-          ))
-        }
+      <View style={styles.separator} />
+      <View style={{ marginTop: 0, marginBottom: 10, width: '100%' }}>
+        <Card
+          style={{
+            width: '100%',
+            borderRadius: 0,
+            /* borderWidth: '80%', */
+            /* shadowColor: 'transparent', */
+          }}
+          // TODO: fix this to look more like settings
+          mode='outlined'
+          elevation={0}
+          onPressOut={() => {
+            setSelectedField(field);
+            showDialog();
+          }}
+        >
+          {
+            editFields.map((field, index) => (
+              <>
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setSelectedField(field);
+                  showDialog();
+                }}
+              >
+                <Card.Title
+                  title={field.name}
+                  titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
+                  subtitle={field.value}
+                  subtitleStyle={{ color: 'gray' }}
+                  rightStyle={{marginRight: 10}}
+                  right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+                />
+              </TouchableOpacity>
+              <Separator style={{ alignSelf: 'center', width: '95%' }} />
+              </>
+            ))
+          }
+        </Card>
       </View>
       <View>
         <Portal>
           <Dialog
-            style={{ borderRadius: 2 }}
+            style={{ backgroundColor: 'white', borderRadius: 2 }}
             visible={visible}
             onDismiss={hideDialog}
           >
@@ -88,13 +100,16 @@ export default function DeviceSettingsScreen() {
         </Portal>
       </View>
       <Button
-        mode='contained'
+        mode='contained-tonal'
+        icon='delete'
+        labelStyle={{ color: theme.colors.onError }}
         onPress={() => console.log('delete device')}
-        buttonColor='red'
+        buttonColor={theme.colors.error}
         style={{
           marginTop: 10,
           width: '90%',
           borderRadius: 10,
+          color: theme.colors.onError,
         }}
       >
         Delete Device
@@ -113,10 +128,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    margin: 5,
+    margin: 0,
   },
   separator: {
     /* marginVertical: 30, */
+    marginVertical: 0,
     height: 1,
     width: '80%',
   },
