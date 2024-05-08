@@ -53,38 +53,12 @@ export default function DeviceInfoCard({ device }) {
   const { batteryIcon, batteryColor } = getBatteryIconAndColor(device.battery);
   const { connectionIcon, connectionColor } = getConnectionIconAndColor(device.battery);
 
-  const cardHeader = (
-    <View 
-      style={{
-        backgroundColor: 'green',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-      }}
-    >
-      <Text 
-        style={{
-          color: 'white',
-        }}
-      >
-        {device.name}
-      </Text>
-      <View style={{ flexGrow: 1 }} />
-      <Text 
-        style={{
-          color: 'red',
-        }}
-        variant='titleSmall'>
-        {device.temp}
-      </Text>
-    </View>
-  );
-
-
   return (
     <Card
       style={{
         width: '90%',
         margin: 5,
+        backgroundColor: 'white',
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: {
@@ -95,12 +69,12 @@ export default function DeviceInfoCard({ device }) {
         shadowRadius: 3.84,
         elevation: 5,
       }}
-      onPress={() => {
-        router.push({
-          pathname: '/(device)/device',
-          params: { name: device.name ?? 'foo' },
-        });
-      }}
+      /* onPress={() => { */
+      /*   router.push({ */
+      /*     pathname: '/(device)/device', */
+      /*     params: { name: device.name ?? 'foo' }, */
+      /*   }); */
+      /* }} */
     >
       <Card.Title
         title={device.name}

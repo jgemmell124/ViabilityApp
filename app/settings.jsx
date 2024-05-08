@@ -1,0 +1,152 @@
+import React, { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { Platform, StyleSheet, View } from 'react-native';
+import { Button, Card, Checkbox, Dialog, Menu, Portal, TextInput } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Text } from 'react-native-paper';
+
+import { Stack } from 'expo-router';
+import Separator from '../components/Seperator';
+
+export default function SettingsScreen() {
+  const [visible, setVisible] = useState(false);
+  // TODO redux
+  const [selected, setSelected] = useState('F');
+
+  const showDialog = () => setVisible(true);
+  const hideDialog = () => setVisible(false);
+
+  const textHeader = (text) => (
+    <View
+      style={{
+        margin: 6,
+        width: '100%',
+        /* backgroundColor: '#f0f0f0', */
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: 'bold',
+        }}>
+        {text}
+      </Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          title: 'Settings',
+        }}
+      />
+      <View style={{ marginTop: 0, marginBottom: 10, width: '100%' }}>
+        {textHeader('Unit Settings')}
+        <Card
+          style={{
+            width: '100%',
+            borderRadius: 0,
+            shadowColor: 'transparent',
+            borderColor: 'transparent',
+          }}
+          mode='outlined'
+          elevation={0}
+          onPressOut={showDialog}
+        >
+          <Card.Title
+            title={'Temperature Unit'}
+            titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
+            subtitle={`°${selected}`}
+            subtitleStyle={{ color: 'gray' }}
+            rightStyle={{marginRight: 10}}
+            right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+          />
+        </Card>
+        {textHeader('App Information')}
+        <Card
+          style={{
+            width: '100%',
+            borderRadius: 0,
+            shadowColor: 'transparent',
+            borderColor: 'transparent',
+          }}
+          mode='outlined'
+          elevation={0}
+        >
+          <Card.Title
+            title={'Privacy Policy'}
+            titleStyle={{ paddingTop: 4, margin: 0, fontSize: 16, fontWeight: 'bold' }}
+            rightStyle={{marginRight: 10}}
+            right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+          />
+          <Separator style={styles.separator} />
+          <Card.Title
+            title={'Feedback / Bug Report'}
+            titleStyle={{ paddingTop: 4, margin: 0, fontSize: 16, fontWeight: 'bold' }}
+            rightStyle={{marginRight: 10}}
+            right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+          />
+          <Separator style={styles.separator} />
+          <Card.Title
+            title={'App Version'}
+            titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
+            subtitle={'1.0.0'}
+            subtitleStyle={{ color: 'gray' }}
+            rightStyle={{marginRight: 10}}
+            right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+          />
+        </Card>
+      </View>
+      <View>
+        <Portal>
+          <Dialog
+            style={{ backgroundColor: 'white', borderRadius: 2 }}
+            visible={visible}
+            onDismiss={hideDialog}
+          >
+            <Dialog.Title>Select Temperature Unit</Dialog.Title>
+            <Dialog.Content>
+              <Checkbox.Item
+                label='Celsius (°C)'
+                status={`${selected === 'C' ? 'checked' : 'unchecked'}`} 
+                onPress={() => {
+                  setSelected('C');
+                  hideDialog();
+                }} />
+              <Checkbox.Item
+                label='Farhenheit (°F)'
+                status={`${selected === 'C' ? 'unchecked' : 'checked'}`} 
+                onPress={() => {
+                  setSelected('F');
+                  hideDialog();
+                }} />
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+      </View>
+      {/* Use a light status bar on iOS to account for the black space above the modal */}
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    /* justifyContent: 'center', */
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  separator: {
+    /* marginVertical: 30, */
+    height: 1,
+    alignSelf: 'center',
+    width: '90%',
+  },
+});
