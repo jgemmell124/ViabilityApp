@@ -31,7 +31,7 @@ export default function DeviceSettingsScreen() {
   const onDelete = () => {
     dispatch(disconnectFromDevice(device));
     navigation.navigate('index');
-  }
+  };
 
   const editFields = [
     { name: 'Name', value: device?.name ?? 'some name' },
@@ -80,33 +80,29 @@ export default function DeviceSettingsScreen() {
           // TODO: fix this to look more like settings
           mode='outlined'
           elevation={0}
-          onPressOut={() => {
-            setSelectedField(field);
-            showDialog();
-          }}
         >
           {
             editFields.map((field, index) => (
               <View key={index}>
-              <TouchableOpacity
-                key={index}
-                onPress={() => {
-                  setSelectedField(field);
-                  showDialog();
-                }}
-              >
-                <Card.Title
-                  title={field.name}
-                  titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-                  subtitle={field.value}
-                  subtitleStyle={{ color: 'gray' }}
-                  rightStyle={{marginRight: 10}}
-                  right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
-                />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    setSelectedField(field);
+                    showDialog();
+                  }}
+                >
+                  <Card.Title
+                    title={field.name}
+                    titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
+                    subtitle={field.value}
+                    subtitleStyle={{ color: 'gray' }}
+                    rightStyle={{marginRight: 10}}
+                    right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+                  />
+                </TouchableOpacity>
                 {
                   index < editFields.length - 1 &&
-                  <Separator style={{ alignSelf: 'center', width: '95%' }} />
+                    <Separator style={{ alignSelf: 'center', width: '95%' }} />
                 }
               </View>
             ))
@@ -126,7 +122,7 @@ export default function DeviceSettingsScreen() {
                 mode='outlined'
                 autoFocus
                 value={selectedField?.value}
-                onChangeText={(text) => {}}
+                onChangeText={() => {}}
               />
             </Dialog.Content>
             <Dialog.Actions>

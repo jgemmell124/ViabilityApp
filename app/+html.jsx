@@ -1,3 +1,5 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { ScrollViewStyleReset } from 'expo-router/html';
 
 // This file is web-only and used to configure the root HTML for every
@@ -26,6 +28,10 @@ export default function Root({ children }) {
     </html>
   );
 }
+
+Root.propTypes = {
+  children: PropTypes.node
+};
 
 const responsiveBackground = `
 body {
