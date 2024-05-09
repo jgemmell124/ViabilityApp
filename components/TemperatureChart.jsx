@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { LineChart } from "react-native-chart-kit"
 import { Dimensions } from "react-native";
 import { Rect, Text } from "react-native-svg";
@@ -8,7 +8,7 @@ import { Text as RenderText } from "react-native-paper";
 export default function TemperatureChart({ tempData, timeRange }) {
 
   const screenWidth = Dimensions.get("window").width;
-  const filterData = ((timeRange) => {
+  const filterData = useMemo(() => ((timeRange) => {
     switch (timeRange) {
       case 'Hour':
         return tempData.filter((temp) => temp.date.getHours() === new Date().getHours());
@@ -21,7 +21,7 @@ export default function TemperatureChart({ tempData, timeRange }) {
       case 'Year':
         return tempData.filter((temp) => temp.date.getFullYear() === new Date().getFullYear());
     }
-  })(timeRange);
+  })(timeRange), [timeRange, tempData]);
   // get hour
   const temps = filterData.map(temp => temp.temperature);
   const dates = filterData.map((temp) => temp.date.toISOString());
