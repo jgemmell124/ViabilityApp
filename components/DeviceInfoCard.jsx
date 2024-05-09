@@ -1,16 +1,12 @@
 /* import { View } from '@/components/Themed'; */
+import PropTypes from 'prop-types';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link, useRootNavigation, useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
-import { Card, Button, Text, useTheme } from 'react-native-paper';
+import { Card, Text, useTheme } from 'react-native-paper';
 import { View } from 'react-native';
-import { connectToDevice } from '@/state/BluetoothLowEnergy/listener';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import { selectDeviceById } from '@/state/store';
+import { useSelector } from 'react-redux';
+import React from 'react';
 
 export default function DeviceInfoCard({ device, navigation }) {
-  const dispatch = useDispatch();
 
   const temperature = useSelector(state => state.ble.retrievedTemp);
 
@@ -20,7 +16,6 @@ export default function DeviceInfoCard({ device, navigation }) {
   /*   dispatch(connectToDevice(device.id)); */
   /* }, []); */
 
-  const router = useRouter();
   const theme = useTheme();
 
   const getBatteryIconAndColor = (battery) => {
@@ -62,7 +57,7 @@ export default function DeviceInfoCard({ device, navigation }) {
       connectionColor = 'red';
     }
     return { connectionIcon, connectionColor };
-  }
+  };
 
   const { batteryIcon, batteryColor } = getBatteryIconAndColor(device.battery);
   const { connectionIcon, connectionColor } = getConnectionIconAndColor(device.battery);
@@ -97,7 +92,7 @@ export default function DeviceInfoCard({ device, navigation }) {
         title={device.name}
         titleStyle={{ fontSize: 20 }}
         subtitle={device.status}
-        right={(props) => 
+        right={() => 
           <Text
             style={{
               alignSelf: 'flex-end',
@@ -210,5 +205,11 @@ export default function DeviceInfoCard({ device, navigation }) {
         </View>
       </Card.Content>
     </Card>
-  )
+  );
+}
+
+DeviceInfoCard.propTypes = {
+  device: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired,
 };
+

@@ -1,9 +1,8 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { bleMiddleware } from "./BluetoothLowEnergy/listener";
+import { bleMiddleware } from './BluetoothLowEnergy/listener';
 
-import bleReducer from "./BluetoothLowEnergy/slice";
+import bleReducer from './BluetoothLowEnergy/slice';
 
 const appReducer = combineReducers({
   ble: bleReducer,
@@ -26,6 +25,6 @@ export const selectDevices = (state) => state.ble.allDevices;
 export const selectConnectedDevices = (state) => state.ble.connectedDevices;
 
 export const selectDeviceById = (id) => (state) => {
-  console.log('----> selectDeviceById', id, state)
+  console.log('----> selectDeviceById', id, state);
   return state.ble.allDevices.find((device) => device.id === id);
-}
+};

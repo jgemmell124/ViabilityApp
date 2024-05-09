@@ -1,22 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, Platform, StyleSheet, Pressable } from 'react-native';
-import { Stack, Link, useNavigation } from 'expo-router';
+import { SafeAreaView, Platform, StyleSheet } from 'react-native';
+import { Stack, useNavigation } from 'expo-router';
 
 import TemperatureChart from '@/components/TemperatureChart';
 
 import { Button, IconButton, SegmentedButtons, Text } from 'react-native-paper';
 
 import { View } from 'react-native';
-import Colors from '@/constants/Colors';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useColorScheme } from '@/components/useColorScheme';
 import Separator from '@/components/Seperator';
-import { useRouter, useLocalSearchParams, useSearchParams } from 'expo-router';
-import tempData from '@/constants/temperature';
+import { useLocalSearchParams } from 'expo-router';
 
-import { LineChart } from 'react-native-chart-kit';
-import tempDate from '@/constants/temperature';
 
 export default function DeviceScreen() {
   // this is really just the device name
@@ -58,8 +53,8 @@ export default function DeviceScreen() {
           paddingRight: 0,
         }}
       />
-    )
-  }
+    );
+  };
 
 
   /* const generateData = () => { */

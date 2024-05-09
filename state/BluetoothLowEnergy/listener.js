@@ -1,22 +1,22 @@
-import { createAsyncThunk, createListenerMiddleware } from "@reduxjs/toolkit";
+import { createAsyncThunk, createListenerMiddleware } from '@reduxjs/toolkit';
 import {
-    deleteDevice,
+  deleteDevice,
   setConnectedDevice,
   setDevice,
   setRetrievedTemp,
   startListening,
   startScanning,
   stopScanning,
-} from "./slice";
+} from './slice';
 
-import bleManager from "./BLEManager";
+import bleManager from './BLEManager';
 
-const DEVICE_NAME = "VIABILITY_DEVICE";
+const DEVICE_NAME = 'VIABILITY_DEVICE';
 
 export const bleMiddleware = createListenerMiddleware();
 
 export const connectToDevice = createAsyncThunk(
-  "bleThunk/connectToDevice",
+  'bleThunk/connectToDevice',
   async (ref, thunkApi) => {
     if (ref.id) {
       await bleManager.connectToPeripheral(ref.id);
@@ -27,17 +27,17 @@ export const connectToDevice = createAsyncThunk(
 );
 
 export const disconnectFromDevice = createAsyncThunk(
-  "bleThunk/disconnectFromDevice",
+  'bleThunk/disconnectFromDevice',
   (ref, thunkApi) => {
     if (ref.id) {
       bleManager.disconnectFromPeripheral(ref.id)
-      .finally(() => thunkApi.dispatch(deleteDevice(ref)));
+        .finally(() => thunkApi.dispatch(deleteDevice(ref)));
     }
   }
 );
 
 export const readTempFromDevice = createAsyncThunk(
-  "bleThunk/readColorFromDevice",
+  'bleThunk/readColorFromDevice',
   async (_, thunkApi) => {
     const temp = await bleManager.readTemp();
     thunkApi.dispatch(setRetrievedTemp(temp));
@@ -49,7 +49,7 @@ bleMiddleware.startListening({
   effect: () => {
     bleManager.stopScanningForPeripherals();
   },
-})
+});
 
 bleMiddleware.startListening({
   actionCreator: startScanning,
