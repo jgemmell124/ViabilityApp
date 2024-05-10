@@ -12,12 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import DeviceInfoCard from '../components/DeviceInfoCard';
 import Separator from '../components/Seperator';
-import { selectConnectedDevices, selectDevices } from '../state/store';
+import { selectConnectedDevice, selectDevices } from '../state/store';
 import { startListening } from '../state/BluetoothLowEnergy/slice';
 import LogoTitle from '../components/LogoTitle';
 
 import { connectToDevice } from '../state/BluetoothLowEnergy/listener';
 import ConnectDeviceButton from '@/components/ConnectDevices';
+import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 
 const styles = StyleSheet.create({
   container: {
@@ -41,20 +42,19 @@ export default function HomeScreen() {
   const dispatch = useDispatch();
 
   const devices = useSelector(selectDevices);
-  const connectedDevices = useSelector(selectConnectedDevices);
+  const connectedDevice = useSelector(selectConnectedDevice);
+
+  const { connectToDevice } = useBLE();
+
+  console.log('devices', devices);
+  console.log('connectedDevice', connectedDevice);
+  
+  if (devices.length > 0 && !connectedDevice) {
+    console.log('connecting to device...');
+    connectToDevice(devices[0]);
+  }
 
 
-  useEffect(() => {
-    // autoconnect to the devices recognized (if not connected);
-    const unconnectedDevices = devices.filter((device) => !connectedDevices.includes(device.id));
-    unconnectedDevices.forEach((device) => dispatch(connectToDevice(device)));
-  }, [devices]);
-
-  useEffect(() => {
-    if (connectedDevices.length !== 0) {
-      dispatch(startListening());
-    }
-  }, [connectedDevices]);
 
   const HeaderLeftIcon = () => (
     <IconButton
@@ -90,16 +90,18 @@ export default function HomeScreen() {
       >
         <Text style={styles.title}>
           My Devices (
-          {devices.length}
+          {/* {devices.length} */}
+          {connectedDevice ? 1 : 0}
           )
         </Text>
         <Separator style={styles.separator} />
         {
-          devices.map((device) => (
+          [connectedDevice].map((device) => (
             <DeviceInfoCard
               navigation={navigation}
-              key={device.id}
-              device={device}
+              key={device?.id}
+              deviceName={device?.name}
+              deviceId={device?.id}
             />
           ))
         }

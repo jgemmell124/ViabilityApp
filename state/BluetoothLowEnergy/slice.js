@@ -14,7 +14,7 @@ import { createAction, createSlice } from '@reduxjs/toolkit';
 // TODO store data on phone
 const initialState = {
   allDevices: [],
-  connectedDevices: [],
+  connectedDevice: null,
   retrievedTemp: undefined,
 };
 
@@ -31,25 +31,23 @@ const bleState = createSlice({
   initialState,
   reducers: {
     setDevice: (state, action) => {
+      console.log(action.payload);
       if (!isDuplicteDevice(state.allDevices, action.payload)) {
         state.allDevices = [action.payload, ...state.allDevices ];
       }
     },
     setConnectedDevice: (state, action) => {
-      if (!isDuplicteDevice(state.connectedDevices, action.payload)) {
-        state.connectedDevices = [...state.connectedDevices, action.payload];
-      }
+      console.log('setConnectedDevice', action.payload);
+      state.connectedDevice = action.payload;
     },
-    // TODO: might have to set the temp to the map of the connected devices
     setRetrievedTemp: (state, action) => {
       state.retrievedTemp = action.payload;
     },
     deleteDevice: (state, action) => {
-      const { device } = action.payload;
-      console.log('deleting device', device);
-      const filterDevice = (d) => d.id !== device?.id;
+      const deviceId = action.payload;
+      const filterDevice = (d) => d.id !== deviceId;
       state.allDevices = state.allDevices.filter(filterDevice);
-      state.connectedDevices = state.connectedDevices.filter(filterDevice);
+      state.connectedDevice = null;
     }
   },
 });

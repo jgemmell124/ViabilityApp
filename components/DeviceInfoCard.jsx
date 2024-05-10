@@ -5,10 +5,17 @@ import { Card, Text, useTheme } from 'react-native-paper';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import React from 'react';
+import { selectConnectedDevice } from '@/state/store';
 
-export default function DeviceInfoCard({ device, navigation }) {
+export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
 
+  const device = useSelector(selectConnectedDevice);
   const temperature = useSelector(state => state.ble.retrievedTemp);
+  const theme = useTheme();
+
+  if (device === null) {
+    return <Text>No device</Text>;
+  }
 
 
   /* useEffect(() => { */
@@ -16,7 +23,6 @@ export default function DeviceInfoCard({ device, navigation }) {
   /*   dispatch(connectToDevice(device.id)); */
   /* }, []); */
 
-  const theme = useTheme();
 
   const getBatteryIconAndColor = (battery) => {
     let batteryIcon = 'battery-empty';
@@ -59,8 +65,8 @@ export default function DeviceInfoCard({ device, navigation }) {
     return { connectionIcon, connectionColor };
   };
 
-  const { batteryIcon, batteryColor } = getBatteryIconAndColor(device.battery);
-  const { connectionIcon, connectionColor } = getConnectionIconAndColor(device.battery);
+  const { batteryIcon, batteryColor } = getBatteryIconAndColor(device?.battery);
+  const { connectionIcon, connectionColor } = getConnectionIconAndColor(device?.battery);
 
   return (
     <Card
@@ -100,7 +106,7 @@ export default function DeviceInfoCard({ device, navigation }) {
               paddingRight: 10,
             }}
           >
-            <FontAwesome name={batteryIcon} color={batteryColor} /> {device.battery}%
+            <FontAwesome name={batteryIcon} color={batteryColor} /> {device?.battery}%
             {' '}<MaterialCommunityIcons name={connectionIcon} color={connectionColor} />
           </Text>
         }
@@ -209,7 +215,8 @@ export default function DeviceInfoCard({ device, navigation }) {
 }
 
 DeviceInfoCard.propTypes = {
-  device: PropTypes.object.isRequired,
+  deviceId: PropTypes.string.isRequired,
+  deviceName: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
 };
 

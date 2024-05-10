@@ -5,12 +5,11 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import { PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { Provider } from 'react-redux';
 
 import { store } from '@/state/store';
-import { requestPermissions } from '@/state/BluetoothLowEnergy/utils';
+import { requestPermissions } from '@/state/BluetoothLowEnergy/permissions';
 
 export {
   // Catch any errors thrown by the Layout component.
