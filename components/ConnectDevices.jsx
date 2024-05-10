@@ -4,15 +4,17 @@ import {
   IconButton, useTheme,
 } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { startScanning, stopScanning } from '../state/BluetoothLowEnergy/slice';
+/* import { startScanning, stopScanning } from '../state/BluetoothLowEnergy/slice'; */
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 
 const ConnectDeviceButton = () => {
   const [isSearching, setIsSearching] = useState(false);
   const theme = useTheme();
   const timeoutRef = useRef(null);
-  const dispatch = useDispatch();
+  /* const dispatch = useDispatch(); */
+  const { scanForPeripherals, stopScanningForPeripherals } = useBLE();
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
@@ -41,12 +43,14 @@ const ConnectDeviceButton = () => {
 
   const stopDeviceScanTimeout = () => setTimeout(() => {
     setIsSearching(false);
-    dispatch(stopScanning());
+    /* dispatch(stopScanning()); */
+    stopScanningForPeripherals();
   }, 8000);
 
   const onAddDevice = () => {
     if (!isSearching) {
-      dispatch(startScanning());
+      /* dispatch(startScanning()); */
+      scanForPeripherals();
       timeoutRef.current = stopDeviceScanTimeout();
     }
     setIsSearching(!isSearching);
@@ -55,7 +59,8 @@ const ConnectDeviceButton = () => {
   const onStopScanning = () => {
     clearTimeout(timeoutRef.current);
     setIsSearching(false);
-    dispatch(stopScanning());
+    /* dispatch(stopScanning()); */
+    stopScanningForPeripherals();
   };
 
   return (

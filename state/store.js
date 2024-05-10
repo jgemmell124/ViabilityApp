@@ -10,9 +10,9 @@ const appReducer = combineReducers({
 
 export const store = configureStore({
   reducer: appReducer,
-  middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(bleMiddleware.middleware);
-  },
+  /* middleware: (getDefaultMiddleware) => { */
+  /*   return getDefaultMiddleware().concat(bleMiddleware.middleware); */
+  /* }, */
 });
 
 /* export type RootState = ReturnType<typeof store.getState>; */
@@ -22,9 +22,8 @@ export const store = configureStore({
 /* export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector; */
 
 export const selectDevices = (state) => state.ble.allDevices;
-export const selectConnectedDevices = (state) => state.ble.connectedDevices;
+export const selectConnectedDevice = (state) => state.ble.connectedDevice;
 
 export const selectDeviceById = (id) => (state) => {
-  console.log('----> selectDeviceById', id, state);
   return state.ble.allDevices.find((device) => device.id === id);
 };

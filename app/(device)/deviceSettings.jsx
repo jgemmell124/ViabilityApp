@@ -7,17 +7,19 @@ import { Text, Button, Card, Dialog, Portal, TextInput, useTheme } from 'react-n
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteDevice } from '@/state/BluetoothLowEnergy/slice';
-import { selectDeviceById } from '@/state/store';
-import { disconnectFromDevice } from '@/state/BluetoothLowEnergy/listener';
+import { useSelector } from 'react-redux';
+import { selectConnectedDevice, selectDeviceById } from '@/state/store';
+import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 
 export default function DeviceSettingsScreen() {
   const { id } = useLocalSearchParams();
-  const dispatch = useDispatch();
+  /* const dispatch = useDispatch(); */
+  const { disconnectFromDevice } = useBLE();
   const navigation = useNavigation();
 
-  const device = useSelector(selectDeviceById(id));
+  // TODO get device by id when supporting multiple devices
+  /* const device = useSelector(selectDeviceById(id)); */
+  const device = useSelector(selectConnectedDevice);
 
 
   const theme = useTheme();
@@ -29,15 +31,17 @@ export default function DeviceSettingsScreen() {
   const hideDialog = () => setVisible(false);
 
   const onDelete = () => {
-    dispatch(disconnectFromDevice(device));
-    navigation.navigate('index');
+    /* dispatch(disconnectFromDevice(device)); */
+    disconnectFromDevice(device?.id).then(
+      () => navigation.navigate('index')
+    );
   };
 
   const editFields = [
     { name: 'Name', value: device?.name ?? 'some name' },
-    { name: 'Location', value: device.loc ?? 'living room' },
-    { name: 'Max Temp', value: device.loc ?? '100' },
-    { name: 'Min Temp', value: device.loc ?? '23' },
+    { name: 'Location', value: device?.loc ?? 'living room' },
+    { name: 'Max Temp', value: device?.loc ?? '100' },
+    { name: 'Min Temp', value: device?.loc ?? '23' },
   ];
 
   const textHeader = (text) => (
@@ -64,7 +68,7 @@ export default function DeviceSettingsScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: `${device.name} Settings`,
+          title: `${device?.name} Settings`,
         }}
       />
       {textHeader('Device Settings')}
