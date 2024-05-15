@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useSelector } from 'react-redux';
-import { selectConnectedDevice, selectDeviceById } from '@/state/store';
+import { selectConnectedDevice, selectDeviceById, selectUnit } from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 
 export default function DeviceSettingsScreen() {
@@ -20,7 +20,7 @@ export default function DeviceSettingsScreen() {
   // TODO get device by id when supporting multiple devices
   /* const device = useSelector(selectDeviceById(id)); */
   const device = useSelector(selectConnectedDevice);
-
+  const unitTemp = useSelector(selectUnit);
 
   const theme = useTheme();
 
@@ -38,10 +38,10 @@ export default function DeviceSettingsScreen() {
   };
 
   const editFields = [
-    { name: 'Name', value: device?.name ?? 'some name' },
-    { name: 'Location', value: device?.loc ?? 'living room' },
-    { name: 'Max Temp', value: device?.loc ?? '100' },
-    { name: 'Min Temp', value: device?.loc ?? '23' },
+    { name: 'Name', value: device?.name ?? 'some name', type: 'text' },
+    { name: 'Location', value: device?.loc ?? 'living room', type: 'text' },
+    { name: `Min Temp (°${unitTemp})`, value: device?.loc ?? 23, type: 'numeric' },
+    { name: `Max Temp (°${unitTemp})`, value: device?.loc ?? 100, type: 'numeric' },
   ];
 
   const textHeader = (text) => (
@@ -123,10 +123,10 @@ export default function DeviceSettingsScreen() {
             <Dialog.Title>Edit {selectedField?.name}</Dialog.Title>
             <Dialog.Content>
               <TextInput
+                inputMode={selectedField?.type}
                 mode='outlined'
                 autoFocus
                 value={selectedField?.value}
-                onChangeText={() => {}}
               />
             </Dialog.Content>
             <Dialog.Actions>

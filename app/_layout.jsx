@@ -42,8 +42,10 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    requestPermissions();
-  }, []);
+    if (loaded) {
+      requestPermissions();
+    }
+  }, [loaded]);
 
   if (!loaded) {
     return null;
@@ -107,7 +109,7 @@ function RootLayoutNav() {
           screenOptions={{
             headerShown: true,
           }}
-          initialRouteName='index'
+          initialRouteName="index"
         >
           {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
           <Stack.Screen name="index" options={{ headerShown: true }} />

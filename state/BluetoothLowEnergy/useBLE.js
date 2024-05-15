@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Buffer } from 'buffer';
 import {
-  BleManager
+  BleManager,
 } from 'react-native-ble-plx';
 
 import base64 from 'react-native-base64';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectConnectedDevice, selectDevices } from '../store';
-import { deleteDevice, setConnectedDevice, setDevice, setRetrievedTemp } from './slice';
+import { deleteDevice, setBatteryLevel, setConnectedDevice, setDevice, setRSSI, setRetrievedTemp } from './slice';
 
-const TEMP_SERVICE = '19b10000-e8f2-537e-4f6c-d104768a9274';
-const TEMP_READ_CHARACTERISTIC = '19b10001-e8f2-537e-4f6c-d104768a9275';
+const UUID16_SVC_ENVIRONMENTAL_SENSING = '181A';
+const UUID16_CHR_TEMPERATURE = '2A6E';
+
+const BATTERY_SERVICE = '0000180F-0000-1000-8000-00805F9B34FB';
+const BATTERY_LEVEL_CHARACTERISTIC = '00002A19-0000-1000-8000-00805F9B34FB';
 
 const DEVICE_NAME = 'VIABILITY_DEVICE';
 
@@ -19,23 +23,61 @@ function useBLE()  {
   const dispatch = useDispatch();
   const allDeivces = useSelector(selectDevices);
   const connectedDevice = useSelector(selectConnectedDevice);
+  const [isConnected, setIsConnected] = useState(false);
 
   const isDuplicteDevice = (devices, nextDevice) => {
     console.log(devices, nextDevice.id);
     return devices.findIndex((device) => nextDevice.id === device.id) > -1;
   };
 
+  useEffect(() => {
+    const rssiSubscription = setInterval(async () => {
+      if (connectedDevice) {
+        try {
+          const device = await bleManager.readRSSIForDevice(connectedDevice.id);
+          dispatch(setRSSI(device.rssi));
+        } catch (e) {
+          console.log('FAILED TO READ RSSI', e);
+          setIsConnected(false);
+        }
+      } else {
+        console.log('No Device Connected');
+      }
+    }, 5000);
+
+    return () => clearInterval(rssiSubscription);
+
+  }, [connectedDevice]);
+
+  useEffect(() => {
+
+    const scanSubscription = setInterval(() => {
+      // stop scan after 5 seconds
+      if (connectedDevice && !isConnected) {
+        console.log('starting scan');
+        setIsConnected(true);
+        reconnectDevice();
+      }
+      setTimeout(() => {
+        stopScanningForPeripherals();
+      }, 5000);
+    }, 10000);
+
+    return () => clearInterval(scanSubscription);
+  }, [isConnected]);
+
   const scanForPeripherals = () => {
     bleManager.startDeviceScan(null, null, (error, device) => {
-      console.log('hererere');
       if (error) {
         console.log(error);
+        return;
       }
       if (isDuplicteDevice(allDeivces ?? [], device)) {
         return;
       }
       if (device.name === DEVICE_NAME) {
         dispatch(setDevice({ id: device.id, name: device.name }));
+        bleManager.stopDeviceScan();
       }
     });
   };
@@ -49,9 +91,38 @@ function useBLE()  {
       const deviceConnection = await bleManager.connectToDevice(device.id);
       dispatch(setConnectedDevice({ id: deviceConnection.id, name: deviceConnection.name }));
       await deviceConnection.discoverAllServicesAndCharacteristics();
+      setIsConnected(true);
       _startStreamingData(deviceConnection);
+      _startBatteryNotify(deviceConnection);
     } catch (e) {
       console.log('FAILED TO CONNECT', e);
+    }
+  };
+
+  // reconnected device after it has been disconnected
+  const reconnectDevice = async () => {
+    if (connectedDevice) {
+      if (!bleManager.isDeviceConnected(connectedDevice.id)) {
+        console.log('device already conneted');
+        setIsConnected(true);
+        return;
+      }
+      console.log('attempting to reconnect');
+      bleManager.startDeviceScan(null, null, async (error, device) => {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        if (device.name === connectedDevice.name && device.id === connectedDevice.id) {
+          console.log('reconnected to device');
+          bleManager.stopDeviceScan();
+          const deviceConnection = await bleManager.connectToDevice(connectedDevice.id);
+          await deviceConnection.discoverAllServicesAndCharacteristics();
+          setIsConnected(true);
+          _startStreamingData(deviceConnection);
+          _startBatteryNotify(deviceConnection);
+        }
+      });
     }
   };
 
@@ -69,33 +140,53 @@ function useBLE()  {
     }
   };
 
-  const _decodeTemp = (value) => {
-    const rawData = base64.decode(value);
-    const temp = parseInt(rawData, 16);
+  const _decodeTemp = (base64Value) => {
+    // temperature is sent as a float in Celcius
+    const rawData = Buffer.from(base64Value, 'base64');
+    const temp = rawData.readFloatLE();
     return temp;
   };
 
-
   const _onReadTemperature = (error, characteristic) => {
     if (error) {
-      console.log(error);
+      console.log('error', error);
       return;
     }
     const temp = _decodeTemp(characteristic?.value);
     dispatch(setRetrievedTemp(temp));
-
   };
 
   const _startStreamingData = async (device) => {
-    console.log('streaming data');
     if (device) {
+      console.log('streaming data');
       device.monitorCharacteristicForService(
-        TEMP_SERVICE,
-        TEMP_READ_CHARACTERISTIC,
+        UUID16_SVC_ENVIRONMENTAL_SENSING,
+        UUID16_CHR_TEMPERATURE,
         _onReadTemperature
       );
     } else {
       console.log('No Device Connected');
+    }
+  };
+
+  const _onReadBattery = (error, characteristic) => {
+    if (error) {
+      console.log('error', error);
+      return;
+    }
+    const valueB64 = characteristic?.value;
+    const decodedBatteryLevel = Buffer.from(valueB64, 'base64').readUInt8();
+    dispatch(setBatteryLevel(decodedBatteryLevel));
+  };
+
+  const _startBatteryNotify = async (device) => {
+    if (device) {
+      console.log(device);
+      device.monitorCharacteristicForService(
+        BATTERY_SERVICE,
+        BATTERY_LEVEL_CHARACTERISTIC,
+        _onReadBattery
+      );
     }
   };
 

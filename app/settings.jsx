@@ -7,11 +7,15 @@ import { Text } from 'react-native-paper';
 
 import { Stack } from 'expo-router';
 import Separator from '../components/Seperator';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUnit } from '@/state/store';
+import { setUnitC, setUnitF } from '@/state/Settings/slice';
 
 export default function SettingsScreen() {
   const [visible, setVisible] = useState(false);
   // TODO redux
-  const [selected, setSelected] = useState('F');
+  const tempUnit = useSelector(selectUnit);
+  const dispatch = useDispatch();
 
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
@@ -59,7 +63,7 @@ export default function SettingsScreen() {
           <Card.Title
             title={'Temperature Unit'}
             titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-            subtitle={`°${selected}`}
+            subtitle={`°${tempUnit}`}
             subtitleStyle={{ color: 'gray' }}
             rightStyle={{marginRight: 10}}
             right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
@@ -110,17 +114,17 @@ export default function SettingsScreen() {
             <Dialog.Title>Select Temperature Unit</Dialog.Title>
             <Dialog.Content>
               <Checkbox.Item
-                label='Celsius (°C)'
-                status={`${selected === 'C' ? 'checked' : 'unchecked'}`} 
+                label='Farhenheit (°F)'
+                status={`${tempUnit === 'C' ? 'unchecked' : 'checked'}`} 
                 onPress={() => {
-                  setSelected('C');
+                  dispatch(setUnitF());
                   hideDialog();
                 }} />
               <Checkbox.Item
-                label='Farhenheit (°F)'
-                status={`${selected === 'C' ? 'unchecked' : 'checked'}`} 
+                label='Celsius (°C)'
+                status={`${tempUnit === 'C' ? 'checked' : 'unchecked'}`} 
                 onPress={() => {
-                  setSelected('F');
+                  dispatch(setUnitC());
                   hideDialog();
                 }} />
             </Dialog.Content>
