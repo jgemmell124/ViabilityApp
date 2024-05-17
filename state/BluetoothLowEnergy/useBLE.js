@@ -77,7 +77,7 @@ function useBLE()  {
       }
       if (device.name === DEVICE_NAME) {
         dispatch(setDevice({ id: device.id, name: device.name }));
-        bleManager.stopDeviceScan();
+        /* bleManager.stopDeviceScan(); */
       }
     });
   };
@@ -87,16 +87,12 @@ function useBLE()  {
   };
 
   const connectToDevice = async (device) => {
-    try {
-      const deviceConnection = await bleManager.connectToDevice(device.id);
-      dispatch(setConnectedDevice({ id: deviceConnection.id, name: deviceConnection.name }));
-      await deviceConnection.discoverAllServicesAndCharacteristics();
-      setIsConnected(true);
-      _startStreamingData(deviceConnection);
-      _startBatteryNotify(deviceConnection);
-    } catch (e) {
-      console.log('FAILED TO CONNECT', e);
-    }
+    const deviceConnection = await bleManager.connectToDevice(device.id);
+    dispatch(setConnectedDevice({ id: deviceConnection.id, name: deviceConnection.name }));
+    await deviceConnection.discoverAllServicesAndCharacteristics();
+    setIsConnected(true);
+    _startStreamingData(deviceConnection);
+    _startBatteryNotify(deviceConnection);
   };
 
   // reconnected device after it has been disconnected

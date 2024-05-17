@@ -11,9 +11,21 @@ import { createAction, createSlice } from '@reduxjs/toolkit';
 /* { id: 7, name: 'Device 7', status: 'Inactive', temp: '54', battery: 0 }, */
 /* ] */
 
+// name and list of devices
+const devices = [
+  { id: '101', name: 'viablity' },
+  { id: '102', name: 'viablity' },
+  { id: '103', name: 'viablity' },
+  { id: '104', name: 'viablity' },
+  { id: '105', name: 'viablity' },
+  { id: '106', name: 'viablity' },
+  { id: '107', name: 'viablity' },
+];
+
 // TODO store data on phone
 const initialState = {
-  allDevices: [],
+  /* allDevices: [], */
+  allDevices: devices,
   connectedDevice: null,
   retrievedTemp: 0,
   lastContact: 0,
