@@ -15,7 +15,10 @@ import { createAction, createSlice } from '@reduxjs/toolkit';
 const initialState = {
   allDevices: [],
   connectedDevice: null,
-  retrievedTemp: undefined,
+  retrievedTemp: 0,
+  lastContact: 0,
+  batteryLevel: 0,
+  rssi: 0,
 };
 
 const isDuplicteDevice = (devices, nextDevice) => {
@@ -42,16 +45,30 @@ const bleState = createSlice({
     },
     setRetrievedTemp: (state, action) => {
       state.retrievedTemp = action.payload;
+      state.lastContact = Date.now();
+    },
+    setBatteryLevel: (state, action) => {
+      state.batteryLevel = action.payload;
     },
     deleteDevice: (state, action) => {
       const deviceId = action.payload;
       const filterDevice = (d) => d.id !== deviceId;
       state.allDevices = state.allDevices.filter(filterDevice);
       state.connectedDevice = null;
+    },
+    setRSSI: (state, action) => {
+      state.rssi = action.payload;
     }
   },
 });
 
-export const { deleteDevice, setDevice, setConnectedDevice, setRetrievedTemp } = bleState.actions;
+export const {
+  deleteDevice,
+  setDevice,
+  setConnectedDevice,
+  setRetrievedTemp,
+  setBatteryLevel,
+  setRSSI,
+} = bleState.actions;
 
 export default bleState.reducer;

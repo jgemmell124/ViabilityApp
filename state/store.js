@@ -3,9 +3,11 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { bleMiddleware } from './BluetoothLowEnergy/listener';
 
 import bleReducer from './BluetoothLowEnergy/slice';
+import settingsReducer from './Settings/slice';
 
 const appReducer = combineReducers({
   ble: bleReducer,
+  settings: settingsReducer
 });
 
 export const store = configureStore({
@@ -23,6 +25,8 @@ export const store = configureStore({
 
 export const selectDevices = (state) => state.ble.allDevices;
 export const selectConnectedDevice = (state) => state.ble.connectedDevice;
+
+export const selectUnit = (state) => state.settings.unit;
 
 export const selectDeviceById = (id) => (state) => {
   return state.ble.allDevices.find((device) => device.id === id);

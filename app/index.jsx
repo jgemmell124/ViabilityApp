@@ -96,10 +96,10 @@ export default function HomeScreen() {
         </Text>
         <Separator style={styles.separator} />
         {
-          [connectedDevice].map((device) => (
+          [connectedDevice].map((device, index) => (
             <DeviceInfoCard
               navigation={navigation}
-              key={device?.id}
+              key={device?.id ?? index}
               deviceName={device?.name}
               deviceId={device?.id}
             />

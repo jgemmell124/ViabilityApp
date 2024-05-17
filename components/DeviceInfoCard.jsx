@@ -5,17 +5,59 @@ import { Card, Text, useTheme } from 'react-native-paper';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import React from 'react';
-import { selectConnectedDevice } from '@/state/store';
+import { selectConnectedDevice, selectUnit } from '@/state/store';
 
 export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
 
   const device = useSelector(selectConnectedDevice);
   const temperature = useSelector(state => state.ble.retrievedTemp);
+  const batteryLevel = useSelector(state => state.ble.batteryLevel);
+  const tempUnit = useSelector(selectUnit);
+  const lastContact = useSelector(state => state.ble.lastContact);
+  const rssi = useSelector(state => state.ble.rssi);
   const theme = useTheme();
+
 
   if (device === null) {
     return <Text>No device</Text>;
   }
+
+  const renderTemp = (temp, unit) => {
+    const decimals = 1;
+    if (unit === 'F') {
+      const tempF = (temp * 9/5) + 32;
+      return `${tempF.toFixed(decimals)} °F`;
+    } else {
+      const tempC = temp.toFixed(decimals);
+      return `${tempC} °C`;
+    }
+  };
+
+
+  const renderLastContact = () => {
+    const now = new Date();
+    const lastContactDate = new Date(lastContact);
+    const timeDiff = now - lastContact;
+    const isWithin15Minutes = timeDiff < 1000 * 60 * 10;
+    return (
+      <>
+        <Text
+          variant='titleSmall'
+        >
+          Last Contact:
+        </Text>
+        <Text
+          variant='titleSmall'
+          style={{ 
+            justifyContent: 'flex-start',
+            color: `${isWithin15Minutes ? 'green' : 'red'}`
+          }}
+        >
+          {lastContactDate.toString().split(' ').slice(0, 5).join(' ')}
+        </Text>
+      </>
+    );
+  };
 
 
   /* useEffect(() => { */
@@ -46,16 +88,16 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
     return { batteryIcon, batteryColor };
   };
 
-  const getConnectionIconAndColor = (connection) => {
-    let connectionIcon = 'battery-empty';
+  const getConnectionIconAndColor = (rssi) => {
+    let connectionIcon = 'signal-cellular-3';
     let connectionColor = 'green';
-    if (connection > 66) {
+    if (rssi > -40) {
       connectionColor = 'green';
       connectionIcon = 'signal-cellular-3';
-    } else if (connection > 33) {
+    } else if (rssi > -70) {
       connectionColor = 'blue';
       connectionIcon = 'signal-cellular-2';
-    } else if (connection > 0) {
+    } else if (rssi > -100) {
       connectionColor = 'orange';
       connectionIcon = 'signal-cellular-1';
     } else {
@@ -65,8 +107,8 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
     return { connectionIcon, connectionColor };
   };
 
-  const { batteryIcon, batteryColor } = getBatteryIconAndColor(device?.battery);
-  const { connectionIcon, connectionColor } = getConnectionIconAndColor(device?.battery);
+  const { batteryIcon, batteryColor } = getBatteryIconAndColor(batteryLevel);
+  const { connectionIcon, connectionColor } = getConnectionIconAndColor(rssi);
 
   return (
     <Card
@@ -106,7 +148,7 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
               paddingRight: 10,
             }}
           >
-            <FontAwesome name={batteryIcon} color={batteryColor} /> {device?.battery}%
+            <FontAwesome name={batteryIcon} color={batteryColor} /> {batteryLevel}%
             {' '}<MaterialCommunityIcons name={connectionIcon} color={connectionColor} />
           </Text>
         }
@@ -127,7 +169,7 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
           }}
         >
           {/* {`${device.temp} °F`} */}
-          {`${temperature} °F`}
+          {renderTemp(temperature, tempUnit)}
         </Text>
         {/* display the threshold */}
         <View
@@ -152,10 +194,10 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
             }}
           >
             <Text variant='labelMedium'>
-              Min: 32°F
+              Min: 32°{tempUnit}
             </Text>
             <Text variant='labelMedium'>
-              Max: 100°F
+              Max: 100°{tempUnit}
             </Text>
           </View>
         </View>
@@ -194,20 +236,7 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
         }}
       >
         <View>
-          <Text
-            variant='titleSmall'
-          >
-            Last Contact:
-          </Text>
-          <Text
-            variant='titleSmall'
-            style={{ 
-              justifyContent: 'flex-start',
-              color: `${device.status === 'Active' ? 'green' : 'red'}`
-            }}
-          >
-            {(new Date()).toString().split(' ').slice(0, 5).join(' ')} (2 hours ago)
-          </Text>
+          {renderLastContact()}
         </View>
       </Card.Content>
     </Card>
