@@ -69,6 +69,7 @@ export default function HomeScreen() {
   const { connectToDevice } = useBLE();
 
   const bottleImage = Image.resolveAssetSource(require('../assets/images/OceanBottle-no-bg.png'));
+  const insulinPenImg = Image.resolveAssetSource(require('../assets/images/insulin-pen.png'));
 
   const HeaderLeftIcon = () => (
     <IconButton
@@ -122,6 +123,7 @@ export default function HomeScreen() {
       </View>
     );
   } else {
+    setVisible(false);
     content = (
       <>
         <Text
@@ -165,6 +167,22 @@ export default function HomeScreen() {
             }}
           >
             <DeviceTemperatureDisplay />
+            <View
+              style={{
+                marginTop: 30,
+                padding: 10,
+                justifyContent: 'center',
+              }}
+            >
+              <Image 
+                style={{
+                  padding: 10,
+                  height: 100,
+                  width: 190,
+                }}
+                source={{ uri: insulinPenImg.uri }}
+              />
+            </View>
           </View>
         </View>
       </>
