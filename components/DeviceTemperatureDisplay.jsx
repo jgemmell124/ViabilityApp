@@ -7,19 +7,34 @@ import { selectConnectedDevice, selectDevices, selectUnit } from '../state/store
 const DeviceTemperatureDisplay = () => {
   const tempUnit = useSelector(selectUnit);
   const connectedDevice = useSelector(selectConnectedDevice);
-  const theme = useTheme();
 
-  const calculateTempColor = (temp) => {
-    if (temp < 40) {
+  const currentTemp = useSelector(state => state.ble.retrievedTemp);
+
+  const calculateTempColor = () => {
+    // calculintg this in C
+    const temp = currentTemp;
+    if (temp < 0) {
       return 'blue';
-    } else if (temp < 50) {
+    } else if (temp < 15) {
       return 'green';
-    } else if (temp < 60) {
+    } else if (temp < 25) {
       return 'yellow';
-    } else if (temp < 70) {
+    } else if (temp < 35) {
       return 'orange';
     } else {
       return 'red';
+    }
+  };
+
+  const renderTemp = () => {
+    const decimals = 0;
+    const temp = currentTemp;
+    if (tempUnit === 'F') {
+      const tempF = (temp * 9/5) + 32;
+      return tempF.toFixed(decimals);
+    } else {
+      const tempC = temp.toFixed(decimals);
+      return tempC;
     }
   };
 
@@ -55,11 +70,11 @@ const DeviceTemperatureDisplay = () => {
           style={{
             alignSelf: 'center',
             justifyContent: 'center',
-            color: calculateTempColor(connectedDevice?.temp ?? 43),
+            color: calculateTempColor(currentTemp),
             fontSize: 100,
           }}
         >
-          {connectedDevice?.temp ?? 43}
+          {renderTemp()}
         </Text>
         <Text
           style={{

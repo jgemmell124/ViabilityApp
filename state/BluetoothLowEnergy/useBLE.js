@@ -88,7 +88,11 @@ function useBLE()  {
 
   const connectToDevice = async (device) => {
     const deviceConnection = await bleManager.connectToDevice(device.id);
-    dispatch(setConnectedDevice({ id: deviceConnection.id, name: deviceConnection.name }));
+    dispatch(setConnectedDevice({ 
+      id: deviceConnection.id,
+      name: deviceConnection.name,
+      friendlyName: deviceConnection.name
+    }));
     await deviceConnection.discoverAllServicesAndCharacteristics();
     setIsConnected(true);
     _startStreamingData(deviceConnection);

@@ -68,12 +68,13 @@ export default function HomeScreen() {
   const styles = makeStyles(theme);
   const { connectToDevice } = useBLE();
 
+  const bottleImage = Image.resolveAssetSource(require('../assets/images/OceanBottle-no-bg.png'));
+
   const HeaderLeftIcon = () => (
     <IconButton
       icon='cog'
       size={25}
       animated
-      // TODO: device settings now?
       onPress={() => navigation.navigate('settings')}
       style={{
         marginLeft: 0,
@@ -83,25 +84,24 @@ export default function HomeScreen() {
   );
 
   const HeaderRightIcon = () => (
-    <IconButton
-      icon='account-edit'
-      size={30}
-      animated
-      // TODO: device settings now?
-      onPress={() => navigation.navigate('deviceSettings')}
-      style={{
-        marginLeft: 0,
-        paddingLeft: 0,
-      }}
-    />
+    _.isEmpty(connectedDevice) ? null : (
+      <IconButton
+        icon='account-edit'
+        size={30}
+        animated
+        onPress={() => navigation.navigate('deviceSettings')}
+        style={{
+          marginLeft: 0,
+          paddingLeft: 0,
+        }}
+      />
+    )
   );
 
+  let content;
   if (_.isEmpty(connectedDevice)) {
-    return (
-      <View style={{
-        ...(styles.noDeviceContainer),
-        backgroundColor: theme.colors.primaryContainer,
-      }}>
+    content =  (
+      <View style={styles.noDeviceContainer}>
         <View
           style={{
             alignItems: 'center',
@@ -121,9 +121,55 @@ export default function HomeScreen() {
         />
       </View>
     );
+  } else {
+    content = (
+      <>
+        <Text
+          style={{
+            margin: 10,
+            padding: 5,
+          }}
+          variant='displaySmall'
+        >
+          {connectedDevice.friendlyName}
+        </Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'space-between' ,
+            flexDirection: 'row',
+            /* alignItems: 'center', */
+          }}
+        >
+          <View
+            style={{
+              /* height: '50%', */
+              paddingLeft: 15,
+              alignItems: 'center',
+            }}
+          >
+            <Image 
+              style={{
+                padding: 10,
+                width: 140,
+                height: 324,
+              }}
+              source={{ uri: bottleImage.uri }}
+            />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              paddingLeft: 10,
+              paddingRight: 10,
+            }}
+          >
+            <DeviceTemperatureDisplay />
+          </View>
+        </View>
+      </>
+    );
   }
-
-  const bottleImage = Image.resolveAssetSource(require('../assets/images/OceanBottle-no-bg.png'));
 
 
   return (
@@ -140,48 +186,7 @@ export default function HomeScreen() {
           },
         }}
       />
-      <Text
-        style={{
-          margin: 10,
-        }}
-        variant='displaySmall'
-      >
-        {connectedDevice.id}
-      </Text>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'space-between' ,
-          flexDirection: 'row',
-          /* alignItems: 'center', */
-        }}
-      >
-        <View
-          style={{
-            /* height: '50%', */
-            paddingLeft: 15,
-            alignItems: 'center',
-          }}
-        >
-          <Image 
-            style={{
-              padding: 10,
-              width: 140,
-              height: 324,
-            }}
-            source={{ uri: bottleImage.uri }}
-          />
-        </View>
-        <View
-          style={{
-            flex: 1,
-            paddingLeft: 10,
-            paddingRight: 10,
-          }}
-        >
-          <DeviceTemperatureDisplay />
-        </View>
-      </View>
+      {content}
     </View>
   );
 }
@@ -193,6 +198,7 @@ const makeStyles = (theme) => StyleSheet.create({
     /* alignItems: 'center', */
   },
   noDeviceContainer: {
+    backgroundColor: theme.colors.secondaryContainer,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

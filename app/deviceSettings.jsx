@@ -7,19 +7,21 @@ import { Text, Button, Card, Dialog, Portal, TextInput, useTheme } from 'react-n
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectConnectedDevice, selectDeviceById, selectUnit } from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
+import { setConnectedDevice } from '@/state/BluetoothLowEnergy/slice';
 
 export default function DeviceSettingsScreen() {
   const { id } = useLocalSearchParams();
   /* const dispatch = useDispatch(); */
   const { disconnectFromDevice } = useBLE();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   // TODO get device by id when supporting multiple devices
   /* const device = useSelector(selectDeviceById(id)); */
-  const device = useSelector(selectConnectedDevice);
+  const connectedDevice = useSelector(selectConnectedDevice);
   const unitTemp = useSelector(selectUnit);
 
   const theme = useTheme();
@@ -31,19 +33,28 @@ export default function DeviceSettingsScreen() {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
+  const handleSaveChange = () => {
+    if (selectedField.name === 'Name') {
+      const newName = selectedField.value;
+      dispatch(setConnectedDevice({ ...connectedDevice, friendlyName: newName }));
+    }
+    hideDialog();
+  };
+
   const onDelete = () => {
     /* dispatch(disconnectFromDevice(device)); */
-    disconnectFromDevice(device?.id).then(
+    disconnectFromDevice(connectedDevice?.id).then(
       () => navigation.navigate('index')
     );
   };
 
   const editFields = [
-    { name: 'Name', value: device?.name ?? 'some name', type: 'text' },
-    { name: 'Location', value: device?.loc ?? 'living room', type: 'text' },
-    { name: `Min Temp (°${unitTemp})`, value: device?.loc ?? 23, type: 'numeric' },
-    { name: `Max Temp (°${unitTemp})`, value: device?.loc ?? 100, type: 'numeric' },
+    { name: 'Location', value: connectedDevice?.loc ?? 'living room', type: 'text' },
+    { name: `Min Temp (°${unitTemp})`, value: connectedDevice?.loc ?? 23, type: 'numeric' },
+    { name: `Max Temp (°${unitTemp})`, value: connectedDevice?.loc ?? 100, type: 'numeric' },
   ];
+
+  const nameField = { name: 'Name', value: connectedDevice?.friendlyName ?? '', type: 'text' };
 
   const textHeader = (text) => (
     <View
@@ -86,10 +97,27 @@ export default function DeviceSettingsScreen() {
             /* shadowColor: 'transparent', */
             borderColor: 'transparent',
           }}
-          // TODO: fix this to look more like settings
           mode='outlined'
           elevation={0}
         >
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedField(nameField);
+                showDialog();
+              }}
+            >
+              <Card.Title
+                title={nameField.name}
+                titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
+                subtitle={nameField.value}
+                subtitleStyle={{ color: 'gray' }}
+                rightStyle={{marginRight: 10}}
+                right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
+              />
+            </TouchableOpacity>
+            <Separator style={{ alignSelf: 'center', width: '95%' }} />
+          </View>
           {
             editFields.map((field, index) => (
               <View key={index}>
@@ -131,12 +159,31 @@ export default function DeviceSettingsScreen() {
                 inputMode={selectedField?.type}
                 mode='outlined'
                 autoFocus
+                onChangeText={(value) => setSelectedField({ ...selectedField, value })}
                 value={selectedField?.value}
               />
             </Dialog.Content>
             <Dialog.Actions>
-              <Button onPress={hideDialog}>Save</Button>
-              <Button onPress={hideDialog}>Cancel</Button>
+              <Button
+                mode='outlined'
+                onPress={hideDialog}
+                style={{
+                  paddingLeft: 5,
+                  paddingRight: 5,
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                mode='contained'
+                onPress={handleSaveChange}
+                style={{
+                  paddingLeft: 5,
+                  paddingRight: 5,
+                }}
+              >
+                Save
+              </Button>
             </Dialog.Actions>
           </Dialog>
         </Portal>
