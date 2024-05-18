@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, View } from 'react-native';
-import { Button, Card, Checkbox, Dialog, Menu, Portal, TextInput } from 'react-native-paper';
+import { Button, Card, Checkbox, Dialog, Menu, Portal, TextInput, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Text } from 'react-native-paper';
 
@@ -16,6 +16,9 @@ export default function SettingsScreen() {
   // TODO redux
   const tempUnit = useSelector(selectUnit);
   const dispatch = useDispatch();
+  const theme = useTheme();
+
+  const styles = makeStyles(theme);
 
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
@@ -45,6 +48,10 @@ export default function SettingsScreen() {
       <Stack.Screen
         options={{
           title: 'Settings',
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: theme.colors.secondaryContainer,
+          },
         }}
       />
       <View style={{ marginTop: 0, marginBottom: 10, width: '100%' }}>
@@ -97,7 +104,7 @@ export default function SettingsScreen() {
           <Card.Title
             title={'App Version'}
             titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-            subtitle={'1.0.0'}
+            subtitle={'1.1.0'}
             subtitleStyle={{ color: 'gray' }}
             rightStyle={{marginRight: 10}}
             right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
@@ -137,11 +144,11 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    /* justifyContent: 'center', */
+    backgroundColor: theme.colors.secondaryContainer,
   },
   title: {
     fontSize: 16,

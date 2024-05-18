@@ -70,11 +70,25 @@ export default function HomeScreen() {
 
   const HeaderLeftIcon = () => (
     <IconButton
-      icon="cog"
+      icon='cog'
       size={25}
       animated
       // TODO: device settings now?
       onPress={() => navigation.navigate('settings')}
+      style={{
+        marginLeft: 0,
+        paddingLeft: 0,
+      }}
+    />
+  );
+
+  const HeaderRightIcon = () => (
+    <IconButton
+      icon='account-edit'
+      size={30}
+      animated
+      // TODO: device settings now?
+      onPress={() => navigation.navigate('deviceSettings')}
       style={{
         marginLeft: 0,
         paddingLeft: 0,
@@ -118,7 +132,7 @@ export default function HomeScreen() {
         options={{
           headerTitle: (props) => <LogoTitle {...props} />,
           headerTitleAlign: 'center',
-          headerRight: () => <ConnectDeviceButton />,
+          headerRight: () => <HeaderRightIcon />,
           headerLeft: () => <HeaderLeftIcon />,
           headerShadowVisible: false,
           headerStyle: {

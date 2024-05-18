@@ -106,16 +106,17 @@ function RootLayoutNav() {
     <Provider store={store}>
       <PaperProvider theme={theme}>
         <Stack
-          screenOptions={{
-            headerShown: true,
-          }}
+          /* screenOptions={{ */
+          /*   headerShown: true, */
+          /* }} */
           initialRouteName="index"
         >
           {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
           <Stack.Screen name="index" options={{ headerShown: true }} />
           {/* <Stack.Screen name="home" options={{ presentation: 'modal' }} /> */}
-          <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="(device)" options={{ headerShown: false }} />
+          <Stack.Screen name="settings" options={{ presentation: 'card' }} />
+          <Stack.Screen name="deviceSettings" options={{ presentation: 'modal' }} />
+          {/* <Stack.Screen name="(device)" options={{ headerShown: false }} /> */}
         </Stack>
       </PaperProvider>
     </Provider>
