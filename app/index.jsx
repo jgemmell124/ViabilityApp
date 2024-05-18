@@ -123,7 +123,6 @@ export default function HomeScreen() {
       </View>
     );
   } else {
-    setVisible(false);
     content = (
       <>
         <Text
