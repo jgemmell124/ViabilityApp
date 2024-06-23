@@ -27,6 +27,7 @@ import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConnectDeviceModal from '@/components/ConnectDeviceModal';
 import DeviceTemperatureDisplay from '@/components/DeviceTemperatureDisplay';
+import DownloadCSVButton from '@/components/DownloadCSV';
 
 
 const ConnectNewDeviceButton = ({ onPress }) => {
@@ -101,6 +102,7 @@ export default function HomeScreen() {
 
   let content;
   if (_.isEmpty(connectedDevice)) {
+    // NO DEVICE CONNECTED
     content =  (
       <View style={styles.noDeviceContainer}>
         <View
@@ -123,6 +125,7 @@ export default function HomeScreen() {
       </View>
     );
   } else {
+    // CONNECTED DEVICE
     content = (
       <>
         <Text
@@ -183,6 +186,13 @@ export default function HomeScreen() {
               />
             </View>
           </View>
+        </View>
+        <View
+          style={{
+            alignItems: 'center',
+          }}
+        >
+          <DownloadCSVButton />
         </View>
       </>
     );

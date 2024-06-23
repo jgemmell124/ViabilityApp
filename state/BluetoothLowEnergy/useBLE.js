@@ -3,6 +3,7 @@ import { Buffer } from 'buffer';
 import {
   BleManager,
 } from 'react-native-ble-plx';
+import * as FileSystem from 'expo-file-system';
 
 import base64 from 'react-native-base64';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +16,10 @@ const UUID16_CHR_TEMPERATURE = '2A6E';
 const BATTERY_SERVICE = '0000180F-0000-1000-8000-00805F9B34FB';
 const BATTERY_LEVEL_CHARACTERISTIC = '00002A19-0000-1000-8000-00805F9B34FB';
 
+const UUID_LOG_TRANSFER_CUSTOM = '63CE';
+const UUID_CHR_TRANSFER_LOG = '63CF';
+const UUID_CHR_TRANSFER_LOG_TRIGGER = '63D0';
+
 const DEVICE_NAME = 'VIABILITY_DEVICE';
 
 const bleManager = new BleManager();
@@ -24,6 +29,7 @@ function useBLE()  {
   const allDeivces = useSelector(selectDevices);
   const connectedDevice = useSelector(selectConnectedDevice);
   const [isConnected, setIsConnected] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const isDuplicteDevice = (devices, nextDevice) => {
     console.log(devices, nextDevice.id);
@@ -95,8 +101,8 @@ function useBLE()  {
     }));
     await deviceConnection.discoverAllServicesAndCharacteristics();
     setIsConnected(true);
-    _startStreamingData(deviceConnection);
-    _startBatteryNotify(deviceConnection);
+    _subscribeTemperatureData(deviceConnection);
+    _subscribeBatteryLevel(deviceConnection);
   };
 
   // reconnected device after it has been disconnected
@@ -119,8 +125,8 @@ function useBLE()  {
           const deviceConnection = await bleManager.connectToDevice(connectedDevice.id);
           await deviceConnection.discoverAllServicesAndCharacteristics();
           setIsConnected(true);
-          _startStreamingData(deviceConnection);
-          _startBatteryNotify(deviceConnection);
+          _subscribeTemperatureData(deviceConnection);
+          _subscribeBatteryLevel(deviceConnection);
         }
       });
     }
@@ -156,7 +162,7 @@ function useBLE()  {
     dispatch(setRetrievedTemp(temp));
   };
 
-  const _startStreamingData = async (device) => {
+  const _subscribeTemperatureData = async (device) => {
     if (device) {
       console.log('streaming data');
       device.monitorCharacteristicForService(
@@ -179,7 +185,7 @@ function useBLE()  {
     dispatch(setBatteryLevel(decodedBatteryLevel));
   };
 
-  const _startBatteryNotify = async (device) => {
+  const _subscribeBatteryLevel = async (device) => {
     if (device) {
       console.log(device);
       device.monitorCharacteristicForService(
@@ -190,11 +196,134 @@ function useBLE()  {
     }
   };
 
+  const streamFileData = async () => {
+    let fileSize = 0;
+    let csvFile = '';
+    let subscription;
+    // TODO set timeout
+    if (connectedDevice) {
+
+      const p = {};
+      p.resolve = () => {};
+      p.promise = new Promise((resolve, reject) => {
+        p.resolve = resolve;
+        p.reject = reject;
+      })
+
+      // do this to retrieve device
+      const device = (await bleManager.readRSSIForDevice(connectedDevice.id))
+
+      console.log('rsii', device.rssi);
+
+      const transactionId = 'FILE_DOWNLOAD';
+      subscription = device?.monitorCharacteristicForService(
+        UUID_LOG_TRANSFER_CUSTOM,
+        UUID_CHR_TRANSFER_LOG,
+        (error, characteristic) => {
+          if (error) {
+            console.log(' character error', error);
+            return;
+          }
+          if (fileSize === 0) {
+            // read the size of the file
+            const sizeData = Buffer.from(characteristic?.value, 'base64');
+            fileSize = sizeData.readUint32LE(); // little endian
+            console.log('file size', fileSize);
+          } else {
+            const data = Buffer.from(characteristic?.value, 'base64');
+            csvFile += data;
+            setDownloadProgress(csvFile.length / fileSize * 100);
+            console.log('DOWNLOADING', csvFile.length / fileSize * 100, '%');
+          }
+          if (csvFile.length >= fileSize) {
+            // stop the stream (EOF)
+            // TODO cancel transaction after timeout?
+            bleManager.cancelTransaction(transactionId);
+            console.log('resolving!');
+            p.resolve();
+          }
+        },
+        transactionId
+      );
+      console.log('awaiting');
+      await p.promise;
+      console.log('done awaiting');
+    } else {
+      console.log('No Device Connected');
+    }
+    subscription?.remove();
+    console.log('subscription remove');
+    setDownloadProgress(0);
+    return csvFile.toString();
+  }
+
+  const triggerFileTransfer = async () => {
+    if (!connectedDevice) {
+      console.log('No Device Connected');
+      return;
+    }
+    // do this to retrieve device
+    const device = (await bleManager.readRSSIForDevice(connectedDevice.id))
+
+    const p = {};
+    p.resolve = () => {};
+    p.promise = new Promise((resolve, reject) => {
+      p.resolve = resolve;
+      p.reject = reject;
+    })
+
+    // set up a stream for the file
+    const transactionId = 'FILE_DOWNLOAD';
+    subscription = device?.monitorCharacteristicForService(
+      UUID_LOG_TRANSFER_CUSTOM,
+      UUID_CHR_TRANSFER_LOG,
+      (error, characteristic) => {
+        if (error) {
+          console.log(' character error', error);
+          return;
+        }
+        if (fileSize === 0) {
+          // read the size of the file
+          const sizeData = Buffer.from(characteristic?.value, 'base64');
+          fileSize = sizeData.readUint32LE(); // little endian
+          console.log('file size', fileSize);
+        } else {
+          const data = Buffer.from(characteristic?.value, 'base64');
+          csvFile += data;
+          console.log('DOWNLOADING', csvFile.length / fileSize * 100, '%');
+        }
+        if (csvFile.length >= fileSize) {
+          // stop the stream (EOF)
+          // TODO cancel transaction after timeout?
+          bleManager.cancelTransaction(transactionId);
+          p.resolve();
+        }
+      },
+      transactionId
+    );
+
+    // tell device we're ready for file transfter
+    device.writeCharacteristicWithoutResponseForService(
+      UUID_LOG_TRANSFER_CUSTOM,
+      UUID_CHR_TRANSFER_LOG_TRIGGER,
+      base64.encode('1')
+    );
+
+    // wait to stream file
+    await p.promise;
+    subscription?.remove();
+
+    return csvFile.toString();
+  };
+
   return {
+    downloadProgress,
     scanForPeripherals,
     stopScanningForPeripherals,
     connectToDevice,
     disconnectFromDevice,
+    triggerFileTransfer,
+    streamFileData,
   };
 }
 
