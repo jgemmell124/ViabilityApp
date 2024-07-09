@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, Platform, StyleSheet } from 'react-native';
 import { Stack, useNavigation } from 'expo-router';
 
-import TemperatureChart from '@/components/TemperatureChart';
+/* import TemperatureChart from '@/components/TemperatureChart'; */
 
 import { Button, IconButton, SegmentedButtons, Text } from 'react-native-paper';
 
