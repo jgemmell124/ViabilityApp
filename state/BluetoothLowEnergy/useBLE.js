@@ -12,6 +12,7 @@ import { deleteDevice, setBatteryLevel, setConnectedDevice, setDevice, setRSSI, 
 
 const UUID16_SVC_ENVIRONMENTAL_SENSING = '181A';
 const UUID16_CHR_TEMPERATURE = '2A6E';
+const UUID16_CHR_NEW_ALERT = '2A46';
 
 const BATTERY_SERVICE = '0000180F-0000-1000-8000-00805F9B34FB';
 const BATTERY_LEVEL_CHARACTERISTIC = '00002A19-0000-1000-8000-00805F9B34FB';
@@ -102,6 +103,7 @@ function useBLE()  {
     await deviceConnection.discoverAllServicesAndCharacteristics();
     setIsConnected(true);
     _subscribeTemperatureData(deviceConnection);
+    _subscribeTemperatureAlerts(deviceConnection)
     _subscribeBatteryLevel(deviceConnection);
   };
 
@@ -126,6 +128,7 @@ function useBLE()  {
           await deviceConnection.discoverAllServicesAndCharacteristics();
           setIsConnected(true);
           _subscribeTemperatureData(deviceConnection);
+          _subscribeTemperatureAlerts(deviceConnection)
           _subscribeBatteryLevel(deviceConnection);
         }
       });
@@ -169,6 +172,28 @@ function useBLE()  {
         UUID16_SVC_ENVIRONMENTAL_SENSING,
         UUID16_CHR_TEMPERATURE,
         _onReadTemperature
+      );
+    } else {
+      console.log('No Device Connected');
+    }
+  };
+
+  const _onReadAlert = (error, characteristic) => {
+    if (error) {
+      console.log('error', error);
+      return;
+    }
+    const alert = _decodeTemp(characteristic?.value);
+    console.log('ALERT', alert);
+  };
+
+  const _subscribeTemperatureAlerts = async (device) => {
+    if (device) {
+      console.log('subscribing to alerts');
+      device.monitorCharacteristicForService(
+        UUID16_SVC_ENVIRONMENTAL_SENSING,
+        UUID16_CHR_NEW_ALERT,
+        _onReadAlert
       );
     } else {
       console.log('No Device Connected');
