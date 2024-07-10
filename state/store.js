@@ -4,10 +4,12 @@ import { bleMiddleware } from './BluetoothLowEnergy/listener';
 
 import bleReducer from './BluetoothLowEnergy/slice';
 import settingsReducer from './Settings/slice';
+import alertsReducer from './Alerts/slice';
 
 const appReducer = combineReducers({
   ble: bleReducer,
-  settings: settingsReducer
+  settings: settingsReducer,
+  alerts: alertsReducer,
 });
 
 export const store = configureStore({
