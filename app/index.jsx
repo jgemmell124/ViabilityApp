@@ -28,6 +28,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConnectDeviceModal from '@/components/ConnectDeviceModal';
 import DeviceTemperatureDisplay from '@/components/DeviceTemperatureDisplay';
 import DownloadCSVButton from '@/components/DownloadCSV';
+import AlertNotifications from '@/components/AlertNotifications';
 
 
 const ConnectNewDeviceButton = ({ onPress }) => {
@@ -139,10 +140,9 @@ export default function HomeScreen() {
         </Text>
         <View
           style={{
-            flex: 1,
             justifyContent: 'space-between' ,
             flexDirection: 'row',
-            /* alignItems: 'center', */
+            alignItems: 'center',
           }}
         >
           <View
@@ -187,6 +187,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+        <AlertNotifications />
         <View
           style={{
             alignItems: 'center',

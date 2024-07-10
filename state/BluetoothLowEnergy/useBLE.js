@@ -8,7 +8,18 @@ import * as FileSystem from 'expo-file-system';
 import base64 from 'react-native-base64';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectConnectedDevice, selectDevices } from '../store';
-import { deleteDevice, setBatteryLevel, setConnectedDevice, setDevice, setRSSI, setRetrievedTemp } from './slice';
+import {
+  deleteDevice,
+  setBatteryLevel,
+  setConnectedDevice,
+  setDevice,
+  setRSSI,
+  setRetrievedTemp
+} from './slice';
+
+import {
+  addAlert,
+} from '../Alerts/slice';
 
 const UUID16_SVC_ENVIRONMENTAL_SENSING = '181A';
 const UUID16_CHR_TEMPERATURE = '2A6E';
@@ -184,7 +195,7 @@ function useBLE()  {
       return;
     }
     const alert = _decodeTemp(characteristic?.value);
-    console.log('ALERT', alert);
+    dispatch(addAlert(alert));
   };
 
   const _subscribeTemperatureAlerts = async (device) => {
