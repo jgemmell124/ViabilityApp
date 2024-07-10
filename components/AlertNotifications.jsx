@@ -2,6 +2,7 @@ import React from 'react';
 import { FlatList, View } from 'react-native';
 import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Separator from './Seperator';
 
 
 const AlertNotifications = () => {
@@ -46,6 +47,8 @@ const AlertNotifications = () => {
         flex: 1,
         margin: 10,
         padding: 10,
+        paddingTop: 15,
+        paddingBottom: 15,
       }}
     >
       <View
@@ -54,7 +57,7 @@ const AlertNotifications = () => {
           justifyContent: 'space-between',
           flexDirection: 'row',
           alignItems: 'center',
-          margin: 5,
+          marginBottom: 10,
           /* alignItems: 'flex-start', */
           /* backgroundColor: '#f0f0f0', */
         }}
@@ -72,6 +75,12 @@ const AlertNotifications = () => {
             </Button>
         }
       </View>
+      <Separator
+        style={{
+          width: '100%',
+          marginBottom: 5
+        }}
+      />
 
       {alerts?.length > 0 ?
         (
@@ -97,6 +106,12 @@ const AlertNotifications = () => {
         )
 
       }
+      <Separator
+        style={{
+          width: '100%',
+          marginTop: 5
+        }}
+      />
     </View>
   );
 }
@@ -131,18 +146,21 @@ const NotificationCard = ({ message }) => {
   return (
     <View
       style={{
-        margin: 3,
-        padding: 10,
-        backgroundColor: '#f0f0f0',
+        margin: 2,
+        padding: 5,
       }}
     >
-      <Card.Title 
-        title={message} 
-        subtitle={'10 minutes ago'}
-        left={notificationIcon}
-        /* right={(props) => <MaterialCommunityIcons {...props} name='close' size={24} color='black' />} */
-        right={closeButton}
-      />
+      <Card
+        mode='elevated'
+      >
+        <Card.Title 
+          title={message} 
+          subtitle={'10 minutes ago'}
+          left={notificationIcon}
+          /* right={(props) => <MaterialCommunityIcons {...props} name='close' size={24} color='black' />} */
+          right={closeButton}
+        />
+      </Card>
     </View>
   );
 };
