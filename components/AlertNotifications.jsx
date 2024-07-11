@@ -3,6 +3,8 @@ import { FlatList, View } from 'react-native';
 import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Separator from './Seperator';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteAlert } from '@/state/Alerts/slice';
 
 // TODO: could also implement a way to view the first one,
 // then have a button that opens a modal to view the rest
@@ -10,6 +12,9 @@ import Separator from './Seperator';
 
 const AlertNotifications = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const alertsState = useSelector(state => state.alerts.alerts);
+
 
   const alerts = [
     {
@@ -69,7 +74,7 @@ const AlertNotifications = () => {
         {
           alerts.length > 0 &&
             <Button
-              onPress={() => console.log('clear all')}
+              onPress={() => dispatch(clearAlerts())}
               mode='contained'
               buttonColor={theme.colors.error}
               rippleColor={theme.colors.error}
@@ -122,7 +127,9 @@ const AlertNotifications = () => {
 export default AlertNotifications;
 
 
+// TODO add in more props
 const NotificationCard = ({ message }) => {
+  const dispatch = useDispatch();
 
   const closeButton = () => {
     return (
@@ -130,7 +137,7 @@ const NotificationCard = ({ message }) => {
         icon='close'
         size={24}
         iconColor='red'
-        onPress={() => console.log('close')}
+        onPress={() => dispatch(deleteAlert('TODO'))}
       />
     )
   }
@@ -160,7 +167,6 @@ const NotificationCard = ({ message }) => {
           title={message} 
           subtitle={'10 minutes ago'}
           left={notificationIcon}
-          /* right={(props) => <MaterialCommunityIcons {...props} name='close' size={24} color='black' />} */
           right={closeButton}
         />
       </Card>

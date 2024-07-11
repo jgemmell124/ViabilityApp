@@ -194,8 +194,8 @@ function useBLE()  {
       console.log('error', error);
       return;
     }
-    const alert = _decodeTemp(characteristic?.value);
-    dispatch(addAlert(alert));
+    const rawData = Buffer.from(characteristic?.value, 'base64');
+    dispatch(addAlert(rawData));
   };
 
   const _subscribeTemperatureAlerts = async (device) => {
