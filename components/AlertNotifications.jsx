@@ -4,6 +4,9 @@ import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Separator from './Seperator';
 
+// TODO: could also implement a way to view the first one,
+// then have a button that opens a modal to view the rest
+// swipe to dismiss, or press x to dismiss
 
 const AlertNotifications = () => {
   const theme = useTheme();
