@@ -28,6 +28,7 @@ export const store = configureStore({
 export const selectDevices = (state) => state.ble.allDevices;
 export const selectConnectedDevice = (state) => state.ble.connectedDevice;
 
+export const selectDeviceType = (state) => state.settings.deviceType;
 export const selectUnit = (state) => state.settings.unit;
 
 export const selectDeviceById = (id) => (state) => {

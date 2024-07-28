@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import Separator from '../components/Seperator';
-import { Text, Button, Card, Dialog, Portal, TextInput, useTheme } from 'react-native-paper';
+import { Text, Button, Card, Dialog, Portal, TextInput, useTheme, Checkbox } from 'react-native-paper';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectConnectedDevice, selectDeviceById, selectUnit } from '@/state/store';
+import { selectConnectedDevice, selectDeviceById, selectDeviceType, selectUnit } from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 import { setConnectedDevice } from '@/state/BluetoothLowEnergy/slice';
+import { setDeviceType } from '@/state/Settings/slice';
+
+const deviceTypes = ['Insulin Pen', 'Insulin Vial', 'Insulin Cartridge'];
 
 export default function DeviceSettingsScreen() {
   const { id } = useLocalSearchParams();
@@ -23,6 +26,7 @@ export default function DeviceSettingsScreen() {
   /* const device = useSelector(selectDeviceById(id)); */
   const connectedDevice = useSelector(selectConnectedDevice);
   const unitTemp = useSelector(selectUnit);
+  const deviceType = useSelector(selectDeviceType);
 
   const theme = useTheme();
   const styles = makeStyles(theme);
@@ -50,6 +54,15 @@ export default function DeviceSettingsScreen() {
 
   const editFields = [
     { name: 'Location', value: connectedDevice?.loc ?? 'living room', type: 'text' },
+    { name: 'Device Type',
+      value: deviceType,
+      type: 'enum',
+      options: deviceTypes,
+      handler: (d) => {
+        console.log(d)
+        dispatch(setDeviceType(d))
+      },
+    },
     { name: `Min Temp (°${unitTemp})`, value: connectedDevice?.loc ?? 23, type: 'numeric' },
     { name: `Max Temp (°${unitTemp})`, value: connectedDevice?.loc ?? 100, type: 'numeric' },
   ];
@@ -155,13 +168,30 @@ export default function DeviceSettingsScreen() {
           >
             <Dialog.Title>Edit {selectedField?.name}</Dialog.Title>
             <Dialog.Content>
-              <TextInput
-                inputMode={selectedField?.type}
-                mode='outlined'
-                autoFocus
-                onChangeText={(value) => setSelectedField({ ...selectedField, value })}
-                value={selectedField?.value}
-              />
+              {
+                selectedField?.type === 'enum' &&
+                  selectedField.options?.map((option, index) => (
+                    <Checkbox.Item
+                      key={index}
+                      label={option}
+                      status={`${deviceType === option ? 'checked' : 'unchecked'}`} 
+                      onPress={() => {
+                        selectedField.handler(option);
+                        hideDialog();
+                      }} />
+
+                  ))
+              }
+              {
+                selectedField?.type === 'text' &&
+                  <TextInput
+                    inputMode={selectedField?.type}
+                    mode='outlined'
+                    autoFocus
+                    onChangeText={(value) => setSelectedField({ ...selectedField, value })}
+                    value={selectedField?.value}
+                  />
+              }
             </Dialog.Content>
             <Dialog.Actions>
               <Button
@@ -226,3 +256,29 @@ const makeStyles = (theme) => StyleSheet.create({
     width: '80%',
   },
 });
+      /* <View> */
+      /*   <Portal> */
+      /*     <Dialog */
+      /*       style={{ backgroundColor: 'white', borderRadius: 2 }} */
+      /*       visible={visible} */
+      /*       onDismiss={hideDialog} */
+      /*     > */
+      /*       <Dialog.Title>Select Temperature Unit</Dialog.Title> */
+      /*       <Dialog.Content> */
+      /*         <Checkbox.Item */
+      /*           label='Farhenheit (°F)' */
+      /*           status={`${tempUnit === 'C' ? 'unchecked' : 'checked'}`}  */
+      /*           onPress={() => { */
+      /*             dispatch(setUnitF()); */
+      /*             hideDialog(); */
+      /*           }} /> */
+      /*         <Checkbox.Item */
+      /*           label='Celsius (°C)' */
+      /*           status={`${tempUnit === 'C' ? 'checked' : 'unchecked'}`}  */
+      /*           onPress={() => { */
+      /*             dispatch(setUnitC()); */
+      /*             hideDialog(); */
+      /*           }} /> */
+      /*       </Dialog.Content> */
+      /*     </Dialog> */
+      /*   </Portal> */

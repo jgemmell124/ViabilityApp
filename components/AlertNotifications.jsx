@@ -4,7 +4,7 @@ import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Separator from './Seperator';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteAlert } from '@/state/Alerts/slice';
+import { deleteAlert, clearAlerts } from '@/state/Alerts/slice';
 
 // TODO: could also implement a way to view the first one,
 // then have a button that opens a modal to view the rest
@@ -13,41 +13,8 @@ import { deleteAlert } from '@/state/Alerts/slice';
 const AlertNotifications = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const alertsState = useSelector(state => state.alerts.alerts);
+  const alerts = useSelector(state => state.alerts.alerts);
 
-
-  const alerts = [
-    {
-      id: 1,
-      message: 'Device 1 has disconnected',
-    },
-    {
-      id: 2,
-      message: 'Device 2 has disconnected',
-    },
-    {
-      id: 3,
-      message: 'Device 3 has disconnected',
-    },
-    {
-      id: 4,
-      message: 'Device 4 has disconnected',
-    },
-    {
-      id: 5,
-      message: 'Device 5 has disconnected',
-    },
-    {
-      id: 6,
-      message: 'Device 6 has disconnected',
-    },
-    {
-      id: 7,
-      message: 'Device 7 has disconnected',
-    },
-  ];
-
-  /* const alerts = []; */
 
   return (
     <View
@@ -96,7 +63,10 @@ const AlertNotifications = () => {
           <FlatList
             fadingEdgeLength={10}
             data={alerts}
-            renderItem={({ item }) => <NotificationCard message={item.message} />}
+            renderItem={({ item }) => <NotificationCard 
+              message={item.message}
+              id={item.id} />
+            }
             keyExtractor={(item) => item.id.toString()}
           />
         )
@@ -128,7 +98,7 @@ export default AlertNotifications;
 
 
 // TODO add in more props
-const NotificationCard = ({ message }) => {
+const NotificationCard = ({ id, message }) => {
   const dispatch = useDispatch();
 
   const closeButton = () => {
@@ -137,7 +107,7 @@ const NotificationCard = ({ message }) => {
         icon='close'
         size={24}
         iconColor='red'
-        onPress={() => dispatch(deleteAlert('TODO'))}
+        onPress={() => dispatch(deleteAlert(id))}
       />
     )
   }
