@@ -1,8 +1,72 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Text, Card, useTheme } from 'react-native-paper';
+import {
+  Text,
+  Tooltip,
+  Card,
+  useTheme,
+  IconButton,
+} from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { selectConnectedDevice, selectDevices, selectUnit } from '../state/store';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ss from 'simple-statistics';
+
+
+// Convert data into points for regression
+const calculateTrend = (data) => {
+  const points = data.map((value, index) => [index, value]);
+
+  // Calculate linear regression
+  const regression = ss.linearRegression(points);
+
+  slope = regression.m;
+  const threshold = 0.08;
+
+  if (slope > threshold) {
+    // since we prepend temps, we need to flip it based on slope
+    return 'down';
+  } else if (slope < -threshold) {
+    return 'up';
+  } else  {
+    return 'neutral';
+  }
+}
+
+
+const TrendIcon = () => {
+  const lastTemps = useSelector(state => state.ble.lastTemps);
+  const trend = calculateTrend(lastTemps);
+
+  let trendToolTipTitle;
+  let color;
+  if (trend === 'up') {
+    trendToolTipTitle = 'Temperature is trending up';
+    color = '#a83232';
+  } else if (trend === 'down') {
+    trendToolTipTitle = 'Temperature is trending down';
+    color = '#327ba8';
+  } else {
+    trendToolTipTitle = 'Temperature is stable';
+    color = '#32a850';
+  }
+
+  return (
+    <Tooltip
+      title={trendToolTipTitle}
+      enterTouchDelay={50}
+    >
+      <IconButton
+        icon={`trending-${trend}`}
+        selected 
+        size={42}
+        iconColor={color}
+        onPress={() => {}}
+      />
+    </Tooltip>
+  );
+};
+
 
 const DeviceTemperatureDisplay = () => {
   const tempUnit = useSelector(selectUnit);
@@ -38,6 +102,8 @@ const DeviceTemperatureDisplay = () => {
     }
   };
 
+
+
   return (
     <View
       style={{
@@ -56,15 +122,23 @@ const DeviceTemperatureDisplay = () => {
           justifyContent: 'center',
         }}
       >
-        <Text variant='titleMedium'>Current Insulin Temperature</Text>
+        <Text variant='titleMedium'>Current Temperature</Text>
       </View>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'center',
-          /* backgroundColor: 'green', */
         }}
       >
+        <Text
+          style={{
+            alignSelf: 'center',
+            marginRight: 2,
+            padding: 0,
+          }}
+        >
+          <TrendIcon />
+        </Text>
 
         <Text
           style={{

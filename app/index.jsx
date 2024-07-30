@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import DeviceInfoCard from '../components/DeviceInfoCard';
 import Separator from '../components/Seperator';
-import { selectConnectedDevice, selectDevices, selectUnit } from '../state/store';
+import { selectConnectedDevice, selectDeviceType, selectDevices, selectUnit } from '../state/store';
 import { startListening } from '../state/BluetoothLowEnergy/slice';
 import LogoTitle from '../components/LogoTitle';
 
@@ -66,6 +66,7 @@ export default function HomeScreen() {
   const dispatch = useDispatch();
   const devices = useSelector(selectDevices);
   const connectedDevice = useSelector(selectConnectedDevice);
+  const deviceType = useSelector(selectDeviceType);
   const theme = useTheme();
   const styles = makeStyles(theme);
   const { connectToDevice } = useBLE();
@@ -133,6 +134,7 @@ export default function HomeScreen() {
           style={{
             margin: 10,
             padding: 5,
+            alignSelf: 'center',
           }}
           variant='displaySmall'
         >
@@ -172,18 +174,40 @@ export default function HomeScreen() {
             <View
               style={{
                 marginTop: 30,
-                padding: 10,
+                /* padding: 10, */
                 justifyContent: 'center',
               }}
             >
-              <Image 
+              <View
                 style={{
                   padding: 10,
-                  height: 100,
-                  width: 190,
+                  borderColor: 'black',
+                  borderStyle: 'solid',
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  width: '100%',
+                  high: 'auto',
                 }}
-                source={{ uri: insulinPenImg.uri }}
-              />
+              >
+                <Text
+                  style={{
+                    marginBottom: 10,
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  Device Type: {deviceType}
+                </Text>
+                <Image 
+                  style={{
+                    padding: 10,
+                    alignSelf: 'center',
+                    height: 100,
+                    width: 190,
+                  }}
+                  source={{ uri: insulinPenImg.uri }}
+                />
+              </View>
             </View>
           </View>
         </View>

@@ -1,6 +1,6 @@
 // Code for the LogoTitle component
 import React, { Image } from 'react-native';
-import logo from '../assets/images/VIAbility_logo.png';
+import logo from '../assets/images/logo-v2.png';
 
 function LogoTitle() {
   const logoUri = Image.resolveAssetSource(logo).uri;
@@ -8,8 +8,8 @@ function LogoTitle() {
     <Image
       source={{ uri: logoUri }}
       style={{
-        height: 50,
-        width: 180,
+        height: 40,
+        width: 110,
       }}
     />
   );
