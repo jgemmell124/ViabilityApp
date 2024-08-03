@@ -3,13 +3,10 @@ import { View } from 'react-native';
 import {
   Text,
   Tooltip,
-  Card,
-  useTheme,
   IconButton,
 } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { selectConnectedDevice, selectDevices, selectUnit } from '../state/store';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ss from 'simple-statistics';
 
 
@@ -20,7 +17,7 @@ const calculateTrend = (data) => {
   // Calculate linear regression
   const regression = ss.linearRegression(points);
 
-  slope = regression.m;
+  const slope = regression.m;
   const threshold = 0.08;
 
   if (slope > threshold) {
@@ -31,7 +28,7 @@ const calculateTrend = (data) => {
   } else  {
     return 'neutral';
   }
-}
+};
 
 
 const TrendIcon = () => {
@@ -70,7 +67,6 @@ const TrendIcon = () => {
 
 const DeviceTemperatureDisplay = () => {
   const tempUnit = useSelector(selectUnit);
-  const connectedDevice = useSelector(selectConnectedDevice);
 
   const currentTemp = useSelector(state => state.ble.retrievedTemp);
 

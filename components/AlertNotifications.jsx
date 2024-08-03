@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FlatList, View } from 'react-native';
 import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
@@ -7,17 +7,22 @@ import Separator from './Seperator';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAlert, deleteAlert, clearAlerts } from '@/state/Alerts/slice';
 import { selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
+import AlertEnum from '@/constants/AlertEnum';
+import AlertDialog from './AlertDialog';
 
 // TODO: could also implement a way to view the first one,
 // then have a button that opens a modal to view the rest
 // swipe to dismiss, or press x to dismiss
 
 const AlertNotifications = () => {
+  const [visible, setVisible] = useState(false);
+  const [currentAlertId, setCurrentAlertId] = useState(null);
   const theme = useTheme();
   const dispatch = useDispatch();
   const alerts = useSelector(state => state.alerts.alerts);
   const unit = useSelector(selectUnit);
 
+  // temperatures in C
   const minTemp = useSelector(selectMinTemp);
   const maxTemp = useSelector(selectMaxTemp);
 
@@ -25,11 +30,12 @@ const AlertNotifications = () => {
   // TODO predict of insulin is bad based on levels
 
   if (temperature < minTemp || temperature > maxTemp) {
-    const temp = unit === 'F' ? (temperature * 9/5) + 32 : temperature;
     dispatch(addAlert({
       id: alerts[0]?.id + 1 || 1,
-      message: `Temperature is out of range: ${temp}°{unit}`,
-      time: Date.now()
+      message: 'Device reached critical temperature',
+      temp: temperature,
+      time: new Date(),
+      type: AlertEnum.SEVERE,
     }));
   }
 
@@ -84,7 +90,14 @@ const AlertNotifications = () => {
             renderItem={({ item }) => <NotificationCard 
               message={item.message}
               id={item.id}
-              time={item.time ?? '10 minutes ago'}
+              temp={item.temp}
+              unit={unit}
+              type={item.type}
+              onPress={() =>  {
+                setVisible(true);
+                setCurrentAlertId(item.id);
+              }}
+              time={item.time ?? new Date() - 60}
             />
             }
             keyExtractor={(item) => item.id.toString()}
@@ -110,6 +123,11 @@ const AlertNotifications = () => {
           marginTop: 5
         }}
       />
+      <AlertDialog
+        visible={visible} 
+        setVisible={setVisible}
+        id={currentAlertId}
+      />
     </View>
   );
 };
@@ -118,7 +136,7 @@ export default AlertNotifications;
 
 
 // TODO add in more props
-const NotificationCard = ({ id, message, time }) => {
+const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
   const dispatch = useDispatch();
 
   const closeButton = () => {
@@ -133,13 +151,35 @@ const NotificationCard = ({ id, message, time }) => {
   };
 
   const notificationIcon = () => {
+    let color = 'black';
+    if (type === AlertEnum.INFO) {
+      color = 'blue';
+    } else if (type === AlertEnum.WARNING) {
+      color = 'orange';
+    } else if (type === AlertEnum.SEVERE) {
+      color = 'red';
+    } 
+
     return (
       <MaterialCommunityIcons
         name='alert-circle'
         size={24}
-        color='black'
+        color={color}
       />
     );
+  };
+
+  // convert temperature to string with correct unit
+  const tempString = (temp, unit) => {
+    if (!temp || !unit) {
+      return '';
+    }
+    if (unit === 'C') {
+      return `: ${temp}°C`;
+    } else {
+      const tempF = (temp * 9/5) + 32;
+      return `: ${tempF}°F`;
+    }
   };
 
 
@@ -160,6 +200,8 @@ const NotificationCard = ({ id, message, time }) => {
     }
   };
 
+  const displayMessage = `${message}${tempString(temp, unit)}`;
+
 
   return (
     <View
@@ -170,9 +212,11 @@ const NotificationCard = ({ id, message, time }) => {
     >
       <Card
         mode='elevated'
+        onPress={onPress}
       >
         <Card.Title 
-          title={message} 
+          title={displayMessage} 
+          titleNumberOfLines={2}
           subtitle={`${timeString(time)} ago`}
           left={notificationIcon}
           right={closeButton}
@@ -185,5 +229,9 @@ const NotificationCard = ({ id, message, time }) => {
 NotificationCard.propTypes = {
   id: PropTypes.number.isRequired,
   message: PropTypes.string.isRequired,
-  time: PropTypes.Date.isRequired,
+  time: PropTypes.objectOf(Date).isRequired,
+  onPress: PropTypes.func.isRequired,
+  type: PropTypes.string.isRequired,
+  temp: PropTypes.number,
+  unit: PropTypes.string,
 };
