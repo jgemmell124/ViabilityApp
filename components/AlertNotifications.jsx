@@ -1,10 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FlatList, View } from 'react-native';
 import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Separator from './Seperator';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteAlert, clearAlerts } from '@/state/Alerts/slice';
+import { addAlert, deleteAlert, clearAlerts } from '@/state/Alerts/slice';
+import { selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
 
 // TODO: could also implement a way to view the first one,
 // then have a button that opens a modal to view the rest
@@ -14,6 +16,22 @@ const AlertNotifications = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const alerts = useSelector(state => state.alerts.alerts);
+  const unit = useSelector(selectUnit);
+
+  const minTemp = useSelector(selectMinTemp);
+  const maxTemp = useSelector(selectMaxTemp);
+
+  const temperature = useSelector(state => state.ble.retrievedTemp);
+  // TODO predict of insulin is bad based on levels
+
+  if (temperature < minTemp || temperature > maxTemp) {
+    const temp = unit === 'F' ? (temperature * 9/5) + 32 : temperature;
+    dispatch(addAlert({
+      id: alerts[0]?.id + 1 || 1,
+      message: `Temperature is out of range: ${temp}°{unit}`,
+      time: Date.now()
+    }));
+  }
 
 
   return (
@@ -65,7 +83,9 @@ const AlertNotifications = () => {
             data={alerts}
             renderItem={({ item }) => <NotificationCard 
               message={item.message}
-              id={item.id} />
+              id={item.id}
+              time={item.time ?? '10 minutes ago'}
+            />
             }
             keyExtractor={(item) => item.id.toString()}
           />
@@ -92,13 +112,13 @@ const AlertNotifications = () => {
       />
     </View>
   );
-}
+};
 
 export default AlertNotifications;
 
 
 // TODO add in more props
-const NotificationCard = ({ id, message }) => {
+const NotificationCard = ({ id, message, time }) => {
   const dispatch = useDispatch();
 
   const closeButton = () => {
@@ -109,8 +129,8 @@ const NotificationCard = ({ id, message }) => {
         iconColor='red'
         onPress={() => dispatch(deleteAlert(id))}
       />
-    )
-  }
+    );
+  };
 
   const notificationIcon = () => {
     return (
@@ -120,7 +140,25 @@ const NotificationCard = ({ id, message }) => {
         color='black'
       />
     );
-  }
+  };
+
+
+  // convert time to seconds ago, minutes ago, hours, ago,
+  const timeString = (time) => {
+    const now = Date.now();
+    const diff = now - time;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+
+    if (seconds < 60) {
+      return `${seconds} seconds`;
+    } else if (minutes < 60) {
+      return `${minutes} minutes`;
+    } else {
+      return `${hours} hours`;
+    }
+  };
 
 
   return (
@@ -135,11 +173,17 @@ const NotificationCard = ({ id, message }) => {
       >
         <Card.Title 
           title={message} 
-          subtitle={'10 minutes ago'}
+          subtitle={`${timeString(time)} ago`}
           left={notificationIcon}
           right={closeButton}
         />
       </Card>
     </View>
   );
+};
+
+NotificationCard.propTypes = {
+  id: PropTypes.number.isRequired,
+  message: PropTypes.string.isRequired,
+  time: PropTypes.Date.isRequired,
 };

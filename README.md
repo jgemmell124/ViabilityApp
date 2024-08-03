@@ -18,3 +18,10 @@ $ npx expo start --clear
 ```
 then make sure it is in development mode
 
+
+### build apk
+```
+eas build -p android --profile preview
+```
+
+then download to device
