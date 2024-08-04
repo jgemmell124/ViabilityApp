@@ -112,10 +112,11 @@ function useBLE()  {
       friendlyName: deviceConnection.name
     }));
     await deviceConnection.discoverAllServicesAndCharacteristics();
-    setIsConnected(true);
+    _readTemperature(deviceConnection);
     _subscribeTemperatureData(deviceConnection);
-    _subscribeTemperatureAlerts(deviceConnection)
+    _subscribeTemperatureAlerts(deviceConnection);
     _subscribeBatteryLevel(deviceConnection);
+    setIsConnected(true);
   };
 
   // reconnected device after it has been disconnected
@@ -232,6 +233,16 @@ function useBLE()  {
     }
   };
 
+  // read temperature after connection
+  const _readTemperature = async (device) => {
+    const characteristic = await device.readCharacteristicForService(
+      UUID16_SVC_ENVIRONMENTAL_SENSING,
+      UUID16_CHR_TEMPERATURE
+    );
+    const temp = _decodeTemp(characteristic?.value);
+    dispatch(setRetrievedTemp(temp));
+  };
+
   const streamFileData = async () => {
     let fileSize = 0;
     let csvFile = '';
@@ -310,7 +321,7 @@ function useBLE()  {
 
     // set up a stream for the file
     const transactionId = 'FILE_DOWNLOAD';
-    subscription = device?.monitorCharacteristicForService(
+    const subscription = device?.monitorCharacteristicForService(
       UUID_LOG_TRANSFER_CUSTOM,
       UUID_CHR_TRANSFER_LOG,
       (error, characteristic) => {

@@ -1,6 +1,7 @@
 import AlertEnum from '@/constants/AlertEnum';
 import { createSlice } from '@reduxjs/toolkit';
 
+// fake state for demo purposes
 const initialState = {
   alerts: [
     {
