@@ -44,7 +44,6 @@ function useBLE()  {
   const [downloadProgress, setDownloadProgress] = useState(0);
 
   const isDuplicteDevice = (devices, nextDevice) => {
-    console.log(devices, nextDevice.id);
     return devices.findIndex((device) => nextDevice.id === device.id) > -1;
   };
 
@@ -72,7 +71,6 @@ function useBLE()  {
     const scanSubscription = setInterval(() => {
       // stop scan after 5 seconds
       if (connectedDevice && !isConnected) {
-        console.log('starting scan');
         setIsConnected(true);
         reconnectDevice();
       }
@@ -140,7 +138,7 @@ function useBLE()  {
           await deviceConnection.discoverAllServicesAndCharacteristics();
           setIsConnected(true);
           _subscribeTemperatureData(deviceConnection);
-          _subscribeTemperatureAlerts(deviceConnection)
+          _subscribeTemperatureAlerts(deviceConnection);
           _subscribeBatteryLevel(deviceConnection);
         }
       });

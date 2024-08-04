@@ -6,7 +6,7 @@ import { Text, Button, Card, Dialog, Portal, TextInput, useTheme, Checkbox } fro
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
+import { Stack, useNavigation } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectConnectedDevice, selectDeviceById, selectDeviceType, selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
@@ -15,11 +15,11 @@ import { setDeviceType, setMaxTempC, setMinTempC } from '@/state/Settings/slice'
 
 const deviceTypes = ['Insulin Pen', 'Insulin Vial', 'Insulin Cartridge'];
 
-const CtoF = (c) => (c * 9 / 5 + 32).toFixed(1);
-const FtoC = (f) => ((f - 32) * 5 / 9).toFixed(1);
+const preciseNumber = (num) => Math.round(num * 100) / 100;
+const CtoF = (c) => preciseNumber(c * 9 / 5 + 32);
+const FtoC = (f) => ((f - 32) * 5 / 9);
 
 export default function DeviceSettingsScreen() {
-  const { id } = useLocalSearchParams();
   /* const dispatch = useDispatch(); */
   const { disconnectFromDevice } = useBLE();
   const navigation = useNavigation();
@@ -57,10 +57,14 @@ export default function DeviceSettingsScreen() {
 
   let minTemp = useSelector(selectMinTemp);
   let maxTemp = useSelector(selectMaxTemp);
+  console.log('minTemp', minTemp, 'maxTemp', maxTemp);
+  // show temp in friendly format
   if (unitTemp === 'F') {
-    console.log('converting to F', minTemp);
     minTemp = CtoF(minTemp);
     maxTemp = CtoF(maxTemp);
+  } else {
+    minTemp = preciseNumber(minTemp);
+    maxTemp = preciseNumber(maxTemp);
   }
 
   const editFields = [

@@ -37,7 +37,6 @@ const bleState = createSlice({
   initialState,
   reducers: {
     setDevice: (state, action) => {
-      console.log(action.payload);
       if (!isDuplicteDevice(state.allDevices, action.payload)) {
         state.allDevices = [action.payload, ...state.allDevices ];
       }
