@@ -8,12 +8,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectConnectedDevice, selectDeviceById, selectDeviceType, selectUnit } from '@/state/store';
+import { selectConnectedDevice, selectDeviceById, selectDeviceType, selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 import { setConnectedDevice } from '@/state/BluetoothLowEnergy/slice';
-import { setDeviceType } from '@/state/Settings/slice';
+import { setDeviceType, setMaxTempC, setMinTempC } from '@/state/Settings/slice';
 
 const deviceTypes = ['Insulin Pen', 'Insulin Vial', 'Insulin Cartridge'];
+
+const CtoF = (c) => c * 9 / 5 + 32;
+const FtoC = (f) => (f - 32) * 5 / 9;
 
 export default function DeviceSettingsScreen() {
   const { id } = useLocalSearchParams();
@@ -52,6 +55,14 @@ export default function DeviceSettingsScreen() {
     );
   };
 
+  let minTemp = useSelector(selectMinTemp);
+  let maxTemp = useSelector(selectMaxTemp);
+  if (unitTemp === 'F') {
+    console.log('converting to F', minTemp);
+    minTemp = CtoF(minTemp);
+    maxTemp = CtoF(maxTemp);
+  }
+
   const editFields = [
     { name: 'Location', value: connectedDevice?.loc ?? 'living room', type: 'text' },
     { name: 'Device Type',
@@ -59,12 +70,30 @@ export default function DeviceSettingsScreen() {
       type: 'enum',
       options: deviceTypes,
       handler: (d) => {
-        console.log(d)
-        dispatch(setDeviceType(d))
+        dispatch(setDeviceType(d));
       },
     },
-    { name: `Min Temp (°${unitTemp})`, value: connectedDevice?.loc ?? 23, type: 'numeric' },
-    { name: `Max Temp (°${unitTemp})`, value: connectedDevice?.loc ?? 100, type: 'numeric' },
+    { name: `Min Temp (°${unitTemp})`,
+      value: minTemp,
+      type: 'numeric',
+      handler: (d) => {
+        if (unitTemp === 'F') {
+          console.log(d);
+          d = FtoC(d);
+        }
+        dispatch(setMinTempC(d));
+      }
+    },
+    { name: `Max Temp (°${unitTemp})`,
+      value: maxTemp,
+      type: 'numeric',
+      handler: (d) => {
+        if (unitTemp === 'F') {
+          d = FtoC(d);
+        }
+        dispatch(setMaxTempC(d));
+      }
+    },
   ];
 
   const nameField = { name: 'Name', value: connectedDevice?.friendlyName ?? '', type: 'text' };
@@ -123,7 +152,7 @@ export default function DeviceSettingsScreen() {
               <Card.Title
                 title={nameField.name}
                 titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-                subtitle={nameField.value}
+                subtitle={`${nameField.value}`}
                 subtitleStyle={{ color: 'gray' }}
                 rightStyle={{marginRight: 10}}
                 right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
@@ -133,7 +162,7 @@ export default function DeviceSettingsScreen() {
           </View>
           {
             editFields.map((field, index) => (
-              <View key={index}>
+              <View key={`${field.name}-${index}`}>
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
@@ -144,7 +173,7 @@ export default function DeviceSettingsScreen() {
                   <Card.Title
                     title={field.name}
                     titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-                    subtitle={field.value}
+                    subtitle={`${field.value ?? 'N/A'}`}
                     subtitleStyle={{ color: 'gray' }}
                     rightStyle={{marginRight: 10}}
                     right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
@@ -190,6 +219,17 @@ export default function DeviceSettingsScreen() {
                     autoFocus
                     onChangeText={(value) => setSelectedField({ ...selectedField, value })}
                     value={selectedField?.value}
+                  />
+              }
+              {
+                selectedField?.type === 'numeric' &&
+                  <TextInput
+                    inputMode={selectedField?.type}
+                    mode='outlined'
+                    autoFocus
+                    keyboardType='numeric'
+                    onChangeText={(value) => setSelectedField({ ...selectedField, value })}
+                    value={selectedField?.value ?? 0}
                   />
               }
             </Dialog.Content>
@@ -256,29 +296,3 @@ const makeStyles = (theme) => StyleSheet.create({
     width: '80%',
   },
 });
-      /* <View> */
-      /*   <Portal> */
-      /*     <Dialog */
-      /*       style={{ backgroundColor: 'white', borderRadius: 2 }} */
-      /*       visible={visible} */
-      /*       onDismiss={hideDialog} */
-      /*     > */
-      /*       <Dialog.Title>Select Temperature Unit</Dialog.Title> */
-      /*       <Dialog.Content> */
-      /*         <Checkbox.Item */
-      /*           label='Farhenheit (°F)' */
-      /*           status={`${tempUnit === 'C' ? 'unchecked' : 'checked'}`}  */
-      /*           onPress={() => { */
-      /*             dispatch(setUnitF()); */
-      /*             hideDialog(); */
-      /*           }} /> */
-      /*         <Checkbox.Item */
-      /*           label='Celsius (°C)' */
-      /*           status={`${tempUnit === 'C' ? 'checked' : 'unchecked'}`}  */
-      /*           onPress={() => { */
-      /*             dispatch(setUnitC()); */
-      /*             hideDialog(); */
-      /*           }} /> */
-      /*       </Dialog.Content> */
-      /*     </Dialog> */
-      /*   </Portal> */

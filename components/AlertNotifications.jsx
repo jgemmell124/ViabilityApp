@@ -7,36 +7,37 @@ import Separator from './Seperator';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAlert, deleteAlert, clearAlerts } from '@/state/Alerts/slice';
 import { selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
-import AlertEnum from '@/constants/AlertEnum';
+import AlertEnum, { iconsMap } from '@/constants/AlertEnum';
 import AlertDialog from './AlertDialog';
-
-// TODO: could also implement a way to view the first one,
-// then have a button that opens a modal to view the rest
-// swipe to dismiss, or press x to dismiss
 
 const AlertNotifications = () => {
   const [visible, setVisible] = useState(false);
-  const [currentAlertId, setCurrentAlertId] = useState(null);
+  const [currentAlertId, setCurrentAlertId] = useState(0);
   const theme = useTheme();
   const dispatch = useDispatch();
   const alerts = useSelector(state => state.alerts.alerts);
   const unit = useSelector(selectUnit);
+  const lastContact = useSelector(state => state.ble.lastContact);
 
   // temperatures in C
   const minTemp = useSelector(selectMinTemp);
   const maxTemp = useSelector(selectMaxTemp);
 
   const temperature = useSelector(state => state.ble.retrievedTemp);
-  // TODO predict of insulin is bad based on levels
 
   if (temperature < minTemp || temperature > maxTemp) {
-    dispatch(addAlert({
-      id: alerts[0]?.id + 1 || 1,
-      message: 'Device reached critical temperature',
-      temp: temperature,
-      time: new Date(),
-      type: AlertEnum.SEVERE,
-    }));
+    if (lastContact > 60 * 1000 && // only update on new contact
+      (alerts.length === 0 ||
+      alerts[0].type !== AlertEnum.SEVERE)) {
+      // only add if not already added
+      dispatch(addAlert({
+        id: alerts[0]?.id + 1 || 1,
+        message: 'Device reached critical temperature',
+        temp: temperature.toFixed(0),
+        time: Date.now(),
+        type: AlertEnum.SEVERE,
+      }));
+    }
   }
 
 
@@ -63,7 +64,7 @@ const AlertNotifications = () => {
       >
         <Text style={{ fontSize: 24 }}>Alerts</Text>
         {
-          alerts.length > 0 &&
+          alerts?.length > 0 &&
             <Button
               onPress={() => dispatch(clearAlerts())}
               mode='contained'
@@ -138,7 +139,6 @@ export default AlertNotifications;
 // TODO add in more props
 const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
   const dispatch = useDispatch();
-
   const closeButton = () => {
     return (
       <IconButton
@@ -151,20 +151,13 @@ const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
   };
 
   const notificationIcon = () => {
-    let color = 'black';
-    if (type === AlertEnum.INFO) {
-      color = 'blue';
-    } else if (type === AlertEnum.WARNING) {
-      color = 'orange';
-    } else if (type === AlertEnum.SEVERE) {
-      color = 'red';
-    } 
+    const iconType = iconsMap[type];
 
     return (
       <MaterialCommunityIcons
-        name='alert-circle'
+        name={iconType.icon}
         size={24}
-        color={color}
+        color={iconType.color}
       />
     );
   };
@@ -229,7 +222,7 @@ const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
 NotificationCard.propTypes = {
   id: PropTypes.number.isRequired,
   message: PropTypes.string.isRequired,
-  time: PropTypes.objectOf(Date).isRequired,
+  time: PropTypes.number.isRequired,
   onPress: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
   temp: PropTypes.number,

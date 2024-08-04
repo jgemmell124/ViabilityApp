@@ -31,8 +31,8 @@ export const selectConnectedDevice = (state) => state.ble.connectedDevice;
 export const selectDeviceType = (state) => state.settings.deviceType;
 export const selectUnit = (state) => state.settings.unit;
 
-export const selectMinTemp = (state) => state.settings.minTemp;
-export const selectMaxTemp = (state) => state.settings.maxTemp;
+export const selectMinTemp = (state) => state.settings.minTempC;
+export const selectMaxTemp = (state) => state.settings.maxTempC;
 
 export const selectDeviceById = (id) => (state) => {
   return state.ble.allDevices.find((device) => device.id === id);
