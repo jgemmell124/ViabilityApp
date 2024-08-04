@@ -1,30 +1,23 @@
 import PropTypes from 'prop-types';
 import React, {
   StyleSheet,
-  ScrollView,
   View,
-  Animated,
-  FlatList,
   Image,
 } from 'react-native';
 import { Stack, useNavigation } from 'expo-router';
 import {
   Button,
-  Card,
-  IconButton, Portal, ProgressBar, Text, Title, useTheme
+  IconButton,
+  Text,
+  useTheme
 } from 'react-native-paper';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import DeviceInfoCard from '../components/DeviceInfoCard';
-import Separator from '../components/Seperator';
+import { useState } from 'react';
 import { selectConnectedDevice, selectDeviceType, selectDevices, selectUnit } from '../state/store';
-import { startListening } from '../state/BluetoothLowEnergy/slice';
 import LogoTitle from '../components/LogoTitle';
 
-import ConnectDeviceButton from '@/components/ConnectDevices';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConnectDeviceModal from '@/components/ConnectDeviceModal';
 import DeviceTemperatureDisplay from '@/components/DeviceTemperatureDisplay';
 import DownloadCSVButton from '@/components/DownloadCSV';
@@ -212,12 +205,14 @@ export default function HomeScreen() {
           </View>
         </View>
         <AlertNotifications />
+        {/* <TemperatureChart /> */}
         <View
           style={{
             alignItems: 'center',
           }}
         >
-          <DownloadCSVButton />
+          { /* Removing downloads for demo */}
+          {/* <DownloadCSVButton /> */}
         </View>
       </>
     );

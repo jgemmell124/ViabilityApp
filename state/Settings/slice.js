@@ -8,8 +8,8 @@ const deviceTypeEnum = {
 
 const initialState = {
   unit: 'F',
-  minTempC: 0,
-  maxTempC: 100,
+  minTempC: 2,
+  maxTempC: 30,
   deviceType: deviceTypeEnum.InsulinPen,
 };
 
@@ -37,5 +37,5 @@ const settingsSlice = createSlice({
   }
 });
 
-export const { setUnitF, setUnitC, setDeviceType } = settingsSlice.actions;
+export const { setUnitF, setUnitC, setDeviceType, setMinTempC, setMaxTempC } = settingsSlice.actions;
 export default settingsSlice.reducer;

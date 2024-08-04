@@ -19,7 +19,6 @@
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.3",
-    "@shopify/react-native-skia": "0.1.221",
     "eas-cli": "^8.0.0",
     "expo": "^51.0.0",
     "expo-dev-client": "~4.0.11",

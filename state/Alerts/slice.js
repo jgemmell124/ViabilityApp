@@ -1,34 +1,39 @@
+import AlertEnum from '@/constants/AlertEnum';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   alerts: [
     {
-      id: 1,
-      message: 'Device 1 has disconnected',
-    },
-    {
-      id: 2,
-      message: 'Device 2 has disconnected',
-    },
-    {
-      id: 3,
-      message: 'Device 3 has disconnected',
+      id: 5,
+      message: 'Device has disconnected',
+      time: new Date() - 6000,
+      type: AlertEnum.INFO,
     },
     {
       id: 4,
-      message: 'Device 4 has disconnected',
+      message: 'Device reached critical temperature',
+      temp: 33,
+      time: new Date() - 50000,
+      type: AlertEnum.SEVERE,
     },
     {
-      id: 5,
-      message: 'Device 5 has disconnected',
+      id: 3,
+      message: 'Device has reconnected',
+      time: new Date() - 1000000,
+      type: AlertEnum.INFO,
     },
     {
-      id: 6,
-      message: 'Device 6 has disconnected',
+      id: 2,
+      message: 'Device has disconnected',
+      time: new Date() - 103030303,
+      type: AlertEnum.INFO,
     },
     {
-      id: 7,
-      message: 'Device 7 has disconnected',
+      id: 1,
+      message: 'Device reached critical temperature',
+      temp: 1,
+      time: new Date() - 50000000,
+      type: AlertEnum.SEVERE,
     },
   ]
 };
@@ -38,7 +43,7 @@ const alertsSlice = createSlice({
   initialState,
   reducers: {
     addAlert(state, action) {
-      state.alerts.push(action.payload);
+      state.alerts = [action.payload, ...state.alerts];
     },
     deleteAlert(state, action) {
       state.alerts = state.alerts.filter((alert) => alert.id !== action.payload);
