@@ -44,5 +44,4 @@ npx expo run:android to build
 
 #### latest build
 
-https://expo.dev/artifacts/eas/n45SM2DyVtkvSJBeiyr4Vh.apk
-
+https://expo.dev/artifacts/eas/21BfnRDv9dLDUqiz3ZTu8F.apk
