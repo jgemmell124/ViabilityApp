@@ -136,10 +136,11 @@ function useBLE()  {
           bleManager.stopDeviceScan();
           const deviceConnection = await bleManager.connectToDevice(connectedDevice.id);
           await deviceConnection.discoverAllServicesAndCharacteristics();
-          setIsConnected(true);
+          _readTemperature(deviceConnection);
           _subscribeTemperatureData(deviceConnection);
           _subscribeTemperatureAlerts(deviceConnection);
           _subscribeBatteryLevel(deviceConnection);
+          setIsConnected(true);
         }
       });
     }
