@@ -26,7 +26,7 @@ const AlertNotifications = () => {
   const temperature = useSelector(state => state.ble.retrievedTemp);
 
   if (temperature < minTemp || temperature > maxTemp) {
-    if (lastContact > 60 * 1000 && // only update on new contact
+    if (lastContact < 60 * 1000 && // only update on new contact
       (alerts.length === 0 ||
       alerts[0].type !== AlertEnum.SEVERE)) {
       // only add if not already added

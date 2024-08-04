@@ -40,3 +40,9 @@ could try
 ```
 npx expo run:android to build
 ```
+
+
+#### latest build
+
+https://expo.dev/artifacts/eas/n45SM2DyVtkvSJBeiyr4Vh.apk
+
