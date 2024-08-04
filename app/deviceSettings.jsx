@@ -15,8 +15,8 @@ import { setDeviceType, setMaxTempC, setMinTempC } from '@/state/Settings/slice'
 
 const deviceTypes = ['Insulin Pen', 'Insulin Vial', 'Insulin Cartridge'];
 
-const CtoF = (c) => c * 9 / 5 + 32;
-const FtoC = (f) => (f - 32) * 5 / 9;
+const CtoF = (c) => (c * 9 / 5 + 32).toFixed(1);
+const FtoC = (f) => ((f - 32) * 5 / 9).toFixed(1);
 
 export default function DeviceSettingsScreen() {
   const { id } = useLocalSearchParams();
@@ -69,34 +69,39 @@ export default function DeviceSettingsScreen() {
       value: deviceType,
       type: 'enum',
       options: deviceTypes,
-      handler: (d) => {
-        dispatch(setDeviceType(d));
+      handler: (value) => {
+        dispatch(setDeviceType(value));
       },
     },
     { name: `Min Temp (°${unitTemp})`,
       value: minTemp,
       type: 'numeric',
-      handler: (d) => {
+      handler: (value) => {
         if (unitTemp === 'F') {
-          console.log(d);
-          d = FtoC(d);
+          console.log(value);
+          value = FtoC(value);
         }
-        dispatch(setMinTempC(d));
+        dispatch(setMinTempC(value));
       }
     },
     { name: `Max Temp (°${unitTemp})`,
       value: maxTemp,
       type: 'numeric',
-      handler: (d) => {
+      handler: (value) => {
         if (unitTemp === 'F') {
-          d = FtoC(d);
+          value = FtoC(value);
         }
-        dispatch(setMaxTempC(d));
+        dispatch(setMaxTempC(value));
       }
     },
   ];
 
-  const nameField = { name: 'Name', value: connectedDevice?.friendlyName ?? '', type: 'text' };
+  const nameField = {
+    name: 'Name',
+    value: connectedDevice?.friendlyName ?? '',
+    type: 'text',
+    handler: handleSaveChange
+  };
 
   const textHeader = (text) => (
     <View
@@ -246,7 +251,10 @@ export default function DeviceSettingsScreen() {
               </Button>
               <Button 
                 mode='contained'
-                onPress={handleSaveChange}
+                onPress={() => {
+                  selectedField.handler(selectedField.value);
+                  hideDialog();
+                }}
                 style={{
                   paddingLeft: 5,
                   paddingRight: 5,

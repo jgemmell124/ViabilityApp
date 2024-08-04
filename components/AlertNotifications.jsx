@@ -91,7 +91,7 @@ const AlertNotifications = () => {
             renderItem={({ item }) => <NotificationCard 
               message={item.message}
               id={item.id}
-              temp={item.temp}
+              temp={item.temp ?? null}
               unit={unit}
               type={item.type}
               onPress={() =>  {
@@ -138,6 +138,7 @@ export default AlertNotifications;
 
 // TODO add in more props
 const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
+  console.log('temp', temp);
   const dispatch = useDispatch();
   const closeButton = () => {
     return (
