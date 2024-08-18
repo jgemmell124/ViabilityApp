@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import {
   Text,
@@ -6,9 +7,9 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { useSelector } from 'react-redux';
-import { selectConnectedDevice, selectDevices, selectUnit } from '../state/store';
+import { selectLastContact, selectUnit } from '../state/store';
 import * as ss from 'simple-statistics';
-
+import { timeAgoString } from '@/utils/utils';
 
 // Convert data into points for regression
 const calculateTrend = (data) => {
@@ -30,22 +31,26 @@ const calculateTrend = (data) => {
   }
 };
 
+const getTempColor = (trend) => {
+  if (trend === 'up') {
+    return 'red';
+  } else if (trend === 'down') {
+    return 'blue';
+  } else {
+    // stable
+    return 'green';
+  }
+};
 
-const TrendIcon = () => {
-  const lastTemps = useSelector(state => state.ble.lastTemps);
-  const trend = calculateTrend(lastTemps);
+const TrendIcon = ({ trend }) => {
 
   let trendToolTipTitle;
-  let color;
   if (trend === 'up') {
     trendToolTipTitle = 'Temperature is trending up';
-    color = '#a83232';
   } else if (trend === 'down') {
     trendToolTipTitle = 'Temperature is trending down';
-    color = '#327ba8';
   } else {
     trendToolTipTitle = 'Temperature is stable';
-    color = '#32a850';
   }
 
   return (
@@ -55,36 +60,29 @@ const TrendIcon = () => {
     >
       <IconButton
         icon={`trending-${trend}`}
-        selected 
+        selected
         size={42}
-        iconColor={color}
+        iconColor={getTempColor(trend)}
         onPress={() => {}}
       />
     </Tooltip>
   );
 };
 
+TrendIcon.propTypes = {
+  trend: PropTypes.oneOf(['up', 'down', 'neutral']).isRequired,
+};
+
 
 const DeviceTemperatureDisplay = () => {
   const tempUnit = useSelector(selectUnit);
+  const lastTemps = useSelector(state => state.ble.lastTemps);
+  const lastContact = useSelector(selectLastContact);
+
+  const trend = calculateTrend(lastTemps);
 
   const currentTemp = useSelector(state => state.ble.retrievedTemp);
 
-  const calculateTempColor = () => {
-    // calculintg this in C
-    const temp = currentTemp;
-    if (temp < 0) {
-      return 'blue';
-    } else if (temp < 15) {
-      return 'green';
-    } else if (temp < 25) {
-      return 'yellow';
-    } else if (temp < 35) {
-      return 'orange';
-    } else {
-      return 'red';
-    }
-  };
 
   const renderTemp = () => {
     const decimals = 0;
@@ -129,18 +127,17 @@ const DeviceTemperatureDisplay = () => {
         <Text
           style={{
             alignSelf: 'center',
-            marginRight: 2,
+            marginRight: 0,
             padding: 0,
           }}
         >
-          <TrendIcon />
+          <TrendIcon trend={trend} />
         </Text>
-
         <Text
           style={{
             alignSelf: 'center',
             justifyContent: 'center',
-            color: calculateTempColor(currentTemp),
+            color: getTempColor(trend),
             fontSize: 100,
           }}
         >
@@ -150,9 +147,21 @@ const DeviceTemperatureDisplay = () => {
           style={{
             alignSelf: 'center',
             marginLeft: 8,
+            marginRight: 8,
           }}
           variant='headlineLarge'
         >°{tempUnit}</Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          paddingBottom: 10
+        }}
+      >
+        <Text variant='labelSmall'>
+          Updated {timeAgoString(lastContact)}
+        </Text>
       </View>
     </View>
   );
