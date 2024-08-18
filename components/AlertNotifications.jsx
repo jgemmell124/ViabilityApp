@@ -9,6 +9,7 @@ import { addAlert, deleteAlert, clearAlerts } from '@/state/Alerts/slice';
 import { selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
 import AlertEnum, { iconsMap } from '@/constants/AlertEnum';
 import AlertDialog from './AlertDialog';
+import { timeAgoString } from '@/utils/utils';
 
 const AlertNotifications = () => {
   const [visible, setVisible] = useState(false);
@@ -88,7 +89,7 @@ const AlertNotifications = () => {
           <FlatList
             fadingEdgeLength={10}
             data={alerts}
-            renderItem={({ item }) => <NotificationCard 
+            renderItem={({ item }) => <NotificationCard
               message={item.message}
               id={item.id}
               temp={item.temp ?? null}
@@ -125,7 +126,7 @@ const AlertNotifications = () => {
         }}
       />
       <AlertDialog
-        visible={visible} 
+        visible={visible}
         setVisible={setVisible}
         id={currentAlertId}
       />
@@ -176,26 +177,7 @@ const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
     }
   };
 
-
-  // convert time to seconds ago, minutes ago, hours, ago,
-  const timeString = (time) => {
-    const now = Date.now();
-    const diff = now - time;
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-
-    if (seconds < 60) {
-      return `${seconds} seconds`;
-    } else if (minutes < 60) {
-      return `${minutes} minutes`;
-    } else {
-      return `${hours} hours`;
-    }
-  };
-
   const displayMessage = `${message}${tempString(temp, unit)}`;
-
 
   return (
     <View
@@ -208,10 +190,10 @@ const NotificationCard = ({ id, message, time, temp, unit, type, onPress }) => {
         mode='elevated'
         onPress={onPress}
       >
-        <Card.Title 
-          title={displayMessage} 
+        <Card.Title
+          title={displayMessage}
           titleNumberOfLines={2}
-          subtitle={`${timeString(time)} ago`}
+          subtitle={timeAgoString(time)}
           left={notificationIcon}
           right={closeButton}
         />

@@ -34,6 +34,8 @@ export const selectUnit = (state) => state.settings.unit;
 export const selectMinTemp = (state) => state.settings.minTempC;
 export const selectMaxTemp = (state) => state.settings.maxTempC;
 
+export const selectLastContact = (state) => state.ble.lastContact;
+
 export const selectDeviceById = (id) => (state) => {
   return state.ble.allDevices.find((device) => device.id === id);
 };
