@@ -40,14 +40,6 @@ export default function DeviceSettingsScreen() {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
-  const handleSaveChange = () => {
-    if (selectedField.name === 'Name') {
-      const newName = selectedField.value;
-      dispatch(setConnectedDevice({ ...connectedDevice, friendlyName: newName }));
-    }
-    hideDialog();
-  };
-
   const onDelete = () => {
     /* dispatch(disconnectFromDevice(device)); */
     disconnectFromDevice(connectedDevice?.id).then(
@@ -57,7 +49,6 @@ export default function DeviceSettingsScreen() {
 
   let minTemp = useSelector(selectMinTemp);
   let maxTemp = useSelector(selectMaxTemp);
-  console.log('minTemp', minTemp, 'maxTemp', maxTemp);
   // show temp in friendly format
   if (unitTemp === 'F') {
     minTemp = CtoF(minTemp);
@@ -68,7 +59,20 @@ export default function DeviceSettingsScreen() {
   }
 
   const editFields = [
-    { name: 'Location', value: connectedDevice?.loc ?? 'living room', type: 'text' },
+    {
+      name: 'Name',
+      value: connectedDevice?.friendlyName ?? '',
+      type: 'text',
+      handler: (value) => {
+        dispatch(setConnectedDevice({ ...connectedDevice, friendlyName: value }));
+      }
+    },
+    {
+      name: 'Location',
+      value: connectedDevice?.loc ?? 'living room',
+      type: 'text',
+      handler: () => {}
+    },
     { name: 'Device Type',
       value: deviceType,
       type: 'enum',
@@ -99,13 +103,6 @@ export default function DeviceSettingsScreen() {
       }
     },
   ];
-
-  const nameField = {
-    name: 'Name',
-    value: connectedDevice?.friendlyName ?? '',
-    type: 'text',
-    handler: handleSaveChange
-  };
 
   const textHeader = (text) => (
     <View
@@ -151,24 +148,6 @@ export default function DeviceSettingsScreen() {
           mode='outlined'
           elevation={0}
         >
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedField(nameField);
-                showDialog();
-              }}
-            >
-              <Card.Title
-                title={nameField.name}
-                titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-                subtitle={`${nameField.value}`}
-                subtitleStyle={{ color: 'gray' }}
-                rightStyle={{marginRight: 10}}
-                right={(props) => <MaterialCommunityIcons {...props} name='chevron-right' />}
-              />
-            </TouchableOpacity>
-            <Separator style={{ alignSelf: 'center', width: '95%' }} />
-          </View>
           {
             editFields.map((field, index) => (
               <View key={`${field.name}-${index}`}>
@@ -212,7 +191,7 @@ export default function DeviceSettingsScreen() {
                     <Checkbox.Item
                       key={index}
                       label={option}
-                      status={`${deviceType === option ? 'checked' : 'unchecked'}`} 
+                      status={`${deviceType === option ? 'checked' : 'unchecked'}`}
                       onPress={() => {
                         selectedField.handler(option);
                         hideDialog();
@@ -253,7 +232,7 @@ export default function DeviceSettingsScreen() {
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 mode='contained'
                 onPress={() => {
                   selectedField.handler(selectedField.value);
