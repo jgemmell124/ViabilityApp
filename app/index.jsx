@@ -22,6 +22,7 @@ import ConnectDeviceModal from '@/components/ConnectDeviceModal';
 import DeviceTemperatureDisplay from '@/components/DeviceTemperatureDisplay';
 import DownloadCSVButton from '@/components/DownloadCSV';
 import AlertNotifications from '@/components/AlertNotifications';
+import DeviceTypeDisplay from '@/components/DeviceTypeDisplay';
 
 
 const ConnectNewDeviceButton = ({ onPress }) => {
@@ -65,7 +66,6 @@ export default function HomeScreen() {
   const { connectToDevice } = useBLE();
 
   const bottleImage = Image.resolveAssetSource(require('../assets/images/OceanBottle-no-bg.png'));
-  const insulinPenImg = Image.resolveAssetSource(require('../assets/images/insulin-pen.png'));
 
   const HeaderLeftIcon = () => (
     <IconButton
@@ -147,7 +147,7 @@ export default function HomeScreen() {
               alignItems: 'center',
             }}
           >
-            <Image 
+            <Image
               style={{
                 padding: 10,
                 width: 140,
@@ -171,36 +171,7 @@ export default function HomeScreen() {
                 justifyContent: 'center',
               }}
             >
-              <View
-                style={{
-                  padding: 10,
-                  borderColor: 'black',
-                  borderStyle: 'solid',
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  width: '100%',
-                  high: 'auto',
-                }}
-              >
-                <Text
-                  style={{
-                    marginBottom: 10,
-                    alignSelf: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  Device Type: {deviceType}
-                </Text>
-                <Image 
-                  style={{
-                    padding: 10,
-                    alignSelf: 'center',
-                    height: 100,
-                    width: 190,
-                  }}
-                  source={{ uri: insulinPenImg.uri }}
-                />
-              </View>
+              <DeviceTypeDisplay />
             </View>
           </View>
         </View>
