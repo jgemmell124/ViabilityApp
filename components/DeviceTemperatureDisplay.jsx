@@ -13,7 +13,7 @@ import { timeAgoString } from '@/utils/utils';
 
 // Convert data into points for regression
 const calculateTrend = (data) => {
-  const points = data.map((value, index) => [index, value]);
+  const points = data.map((value, index) => [index, value.temp]);
 
   // Calculate linear regression
   const regression = ss.linearRegression(points);

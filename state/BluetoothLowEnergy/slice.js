@@ -1,6 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 
-const RECENT_TEMPS_COUNT = 10;
+const RECENT_TEMPS_COUNT = 30;
 
 /* const devices = [ */
 /* { id: 0, name: 'My Device', status: 'Active', temp: '48', battery: 99 }, */
@@ -45,9 +45,15 @@ const bleState = createSlice({
       state.connectedDevice = action.payload;
     },
     setRetrievedTemp: (state, action) => {
-      state.retrievedTemp = action.payload;
-      state.lastContact = Date.now();
-      state.lastTemps = [action.payload, ...state.lastTemps.slice(0, RECENT_TEMPS_COUNT - 1)];
+      const now = Date.now();
+      const temp = action.payload;
+      const newTemp = {
+        temp,
+        time: now,
+      };
+      state.retrievedTemp = temp;
+      state.lastContact = now;
+      state.lastTemps = [newTemp, ...state.lastTemps.slice(0, RECENT_TEMPS_COUNT - 1)];
     },
     setBatteryLevel: (state, action) => {
       state.batteryLevel = action.payload;

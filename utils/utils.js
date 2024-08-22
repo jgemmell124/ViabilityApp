@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import * as ss from 'simple-statistics';
 
 const REFRESH_INTERVAL = 30 * 1000; // 30 seconds
 
@@ -44,4 +45,52 @@ export const timeAgoString = (time) => {
       return `${hours} hours ago`;
     }
   }
+};
+
+
+/**
+ * Predicts when tempreature will go bad based on user
+ * defined threshold
+ *
+ */
+export const predictTempTrend = (
+  data,
+  highThreshold,
+  lowThreshold,
+  timeoutThreshold=45 //timeout in minutes
+) => {
+
+  const points = useMemo(() => {
+    // since the data is prepended
+    return data.map((d) => [d.time, d.temp]).reverse();
+  }, [data]);
+
+  // Calculate linear regression
+  const regression = ss.linearRegression(points);
+
+  const slope = regression.m;
+  const intercept = regression.b;
+
+  let seconds = 0;
+  if (slope > 0) {
+    // trending upwards temp
+    seconds = slope * (highThreshold) + intercept;
+  } else if (slope < 0) {
+    // trending downwards temp
+    seconds = slope * (lowThreshold) + intercept;
+  }
+
+  const now = Date.now();
+  const diff = seconds - now;
+  if (diff <  (1 + timeoutThreshold) * 60 * 1000
+    && diff > (1 - timeoutThreshold) * 60 * 1000
+  ) {
+    // TODO:
+    // insulin will go bad in less than 45 minutes
+    // placeholder for now
+    return true;
+  } else {
+    return false;
+  }
+
 };

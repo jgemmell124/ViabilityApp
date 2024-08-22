@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FlatList, View } from 'react-native';
 import { Text, Card, Button, IconButton, useTheme } from 'react-native-paper';
@@ -9,7 +9,7 @@ import { addAlert, deleteAlert, clearAlerts } from '@/state/Alerts/slice';
 import { selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
 import AlertEnum, { iconsMap } from '@/constants/AlertEnum';
 import AlertDialog from './AlertDialog';
-import { timeAgoString } from '@/utils/utils';
+import { predictTempTrend, timeAgoString } from '@/utils/utils';
 
 const AlertNotifications = () => {
   const [visible, setVisible] = useState(false);
@@ -25,6 +25,7 @@ const AlertNotifications = () => {
   const maxTemp = useSelector(selectMaxTemp);
 
   const temperature = useSelector(state => state.ble.retrievedTemp);
+  const recentTemps = useSelector(state => state.ble.lastTemps);
 
   if (temperature < minTemp || temperature > maxTemp) {
     if ((Date.now() - lastContact < 1000) && // only update on new contact
@@ -41,6 +42,47 @@ const AlertNotifications = () => {
     }
   }
 
+  // TODO: must keep track of these, if stabilized, then add alert
+  const isGoingBadin45 = predictTempTrend(recentTemps, maxTemp, minTemp);
+  if (isGoingBadin45 !== isGoingBadin45) {
+    if (alerts.length === 0 ||
+      alerts[0].type !== AlertEnum.WARNING) {
+      // only add if not already added
+      dispatch(addAlert({
+        id: alerts[0]?.id + 1 || 1,
+        message: 'Predicting critical temp in 45 minutes',
+        temp: temperature.toFixed(0),
+        time: Date.now(),
+        type: AlertEnum.WARNING,
+      }));
+    }
+  }
+
+  const isGoingBadIn15 = predictTempTrend(recentTemps, maxTemp, minTemp, 15);
+  if (isGoingBadIn15 !== isGoingBadIn15) {
+    if (alerts.length === 0 ||
+      alerts[0].type !== AlertEnum.WARNING) {
+      // only add if not already added
+      dispatch(addAlert({
+        id: alerts[0]?.id + 1 || 1,
+        message: 'Predicting critical temp in 45 minutes',
+        temp: temperature.toFixed(0),
+        time: Date.now(),
+        type: AlertEnum.WARNING,
+      }));
+    }
+  }
+
+  if (alerts[0]?.type === AlertEnum.WARNING
+    && (!isGoingBadIn15 && !isGoingBadin45)) {
+    // only add if not already added
+    dispatch(addAlert({
+      id: alerts[0]?.id + 1 || 1,
+      message: 'Temperature stabilized',
+      time: Date.now(),
+      type: AlertEnum.INFO,
+    }));
+  }
 
   return (
     <View
