@@ -1,4 +1,3 @@
-/* import { View } from '@/components/Themed'; */
 import PropTypes from 'prop-types';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Text, useTheme } from 'react-native-paper';
@@ -7,7 +6,7 @@ import { useSelector } from 'react-redux';
 import React from 'react';
 import { selectConnectedDevice, selectUnit } from '@/state/store';
 
-export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
+export default function DeviceInfoCard({ navigation }) {
 
   const device = useSelector(selectConnectedDevice);
   const temperature = useSelector(state => state.ble.retrievedTemp);
@@ -48,7 +47,7 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
         </Text>
         <Text
           variant='titleSmall'
-          style={{ 
+          style={{
             justifyContent: 'flex-start',
             color: `${isWithin15Minutes ? 'green' : 'red'}`
           }}
@@ -58,12 +57,6 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
       </>
     );
   };
-
-
-  /* useEffect(() => { */
-  /*   console.log('connecting........ use effect'); */
-  /*   dispatch(connectToDevice(device.id)); */
-  /* }, []); */
 
 
   const getBatteryIconAndColor = (battery) => {
@@ -116,21 +109,12 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
         width: '90%',
         margin: 5,
         backgroundColor: 'white',
-        /* borderRadius: 10, */
-        /* shadowColor: '#000', */
-        /* shadowOffset: { */
-        /*   width: 0, */
-        /*   height: 1, */
-        /* }, */
-        /* shadowOpacity: 0.25, */
-        /* shadowRadius: 3.84, */
-        /* elevation: 5, */
       }}
       theme={theme}
       mode='elevated'
       elevation={1}
       onPress={() => {
-        navigation.navigate('(device)', { 
+        navigation.navigate('(device)', {
           screen: 'device',
           params: { name: device?.name, id: device?.id},
         });
@@ -140,7 +124,7 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
         title={device.name}
         titleStyle={{ fontSize: 20 }}
         subtitle={device.status}
-        right={() => 
+        right={() =>
           <Text
             style={{
               alignSelf: 'flex-end',
@@ -217,7 +201,7 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
           </Text>
           <Text
             variant='titleSmall'
-            style={{ 
+            style={{
               justifyContent: 'flex-start',
               color: 'red',
             }}
@@ -227,8 +211,8 @@ export default function DeviceInfoCard({ deviceId, deviceName, navigation }) {
         </View>
       </Card.Content>
       {/* Last Contact */}
-      <Card.Content 
-        style={{ 
+      <Card.Content
+        style={{
           padding: 10,
           margin: 0,
           justifyContent: 'space-between',

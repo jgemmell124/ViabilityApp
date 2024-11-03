@@ -9,11 +9,11 @@ const DeviceTypeDisplay = () => {
   const deviceType = useSelector(selectDeviceType);
   let image;
   if (deviceType === 'Insulin Pen') {
-    image = Image.resolveAssetSource(require('../assets/images/insulin-pen.png'));
+    image = Image.resolveAssetSource(require('@/assets/images/insulin-pen.png'));
   } else if (deviceType === 'Insulin Vial') {
-    image = Image.resolveAssetSource(require('../assets/images/insulin-vial.png'));
+    image = Image.resolveAssetSource(require('@/assets/images/insulin-vial.png'));
   } else if (deviceType === 'Insulin Cartridge') {
-    image = Image.resolveAssetSource(require('../assets/images/insulin-cartridge.png'));
+    image = Image.resolveAssetSource(require('@/assets/images/insulin-cartridge.png'));
   }
 
   return (

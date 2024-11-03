@@ -7,29 +7,9 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { useSelector } from 'react-redux';
-import { selectLastContact, selectUnit } from '../state/store';
-import * as ss from 'simple-statistics';
+import { selectLastContact, selectUnit } from '@/state/store';
 import { timeAgoString } from '@/utils/utils';
-
-// Convert data into points for regression
-const calculateTrend = (data) => {
-  const points = data.map((value, index) => [index, value]);
-
-  // Calculate linear regression
-  const regression = ss.linearRegression(points);
-
-  const slope = regression.m;
-  const threshold = 0.08;
-
-  if (slope > threshold) {
-    // since we prepend temps, we need to flip it based on slope
-    return 'down';
-  } else if (slope < -threshold) {
-    return 'up';
-  } else  {
-    return 'neutral';
-  }
-};
+import { calculateTrend } from '@/algos/algos';
 
 const getTempColor = (trend) => {
   if (trend === 'up') {

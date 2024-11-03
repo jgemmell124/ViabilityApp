@@ -87,17 +87,14 @@ const DeviceSettingsDialog = ({ selectedField, setSelectedField, visible, hideDi
       </Dialog>
     </Portal>
   );
-
-
-
 };
 
 DeviceSettingsDialog.propTypes = {
   selectedField: PropTypes.shape({
     name: PropTypes.string,
-    type: PropTypes.string,
+    value: PropTypes.any,
     options: PropTypes.array,
-    value: PropTypes.oneOfType(['enum', 'text', 'numeric']),
+    type: PropTypes.oneOf(['enum', 'text', 'numeric']),
     handler: PropTypes.func,
   }).isRequired,
   setSelectedField: PropTypes.func.isRequired,

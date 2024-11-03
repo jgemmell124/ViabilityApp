@@ -20,16 +20,6 @@ export const timeAgoString = (time) => {
   const hours = Math.floor(minutes / 60);
 
   if (seconds < 60) {
-    /* if (seconds === 1) { */
-    /*   return `${seconds} second ago`; */
-    /* } else { */
-    /*   return `${seconds} seconds ago`; */
-    /* } */
-    /* if (seconds < 10) { */
-    /*   return 'just now'; */
-    /* } else { */
-    /*   return 'less than a minute ago'; */
-    /* } */
     return 'just now';
   } else if (minutes < 60) {
     if (minutes === 1) {

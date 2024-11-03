@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, FlatList, ScrollView, View } from 'react-native';
+import { Animated, FlatList } from 'react-native';
 import {
   Button,
   Checkbox,
@@ -22,7 +22,6 @@ const states = {
 };
 
 const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
-  const [isSearching, setIsSearching] = useState(true);
   const [selectedDevice, setSelectedDevice] = useState();
   const [error, setError] = useState('');
   const [state, setState] = useState(states.SEARCHING);
@@ -40,8 +39,6 @@ const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
 
   useEffect(() => {
     const stopDeviceScanTimeout = () => setTimeout(() => {
-      setIsSearching(false);
-      /* dispatch(stopScanning()); */
       stopScanningForPeripherals();
     }, 8000);
 
@@ -70,26 +67,6 @@ const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
     }
   };
 
-  /* const dispatch = useDispatch(); */
-
-
-  /* const onAddDevice = () => { */
-  /*   if (!isSearching) { */
-  /*     /* dispatch(startScanning()); */
-  /*     scanForPeripherals(); */
-  /*     timeoutRef.current = stopDeviceScanTimeout(); */
-  /*   } */
-  /*   setIsSearching(!isSearching); */
-  /* }; */
-
-  /* const onStopScanning = () => { */
-  /*   clearTimeout(timeoutRef.current); */
-  /*   setIsSearching(false); */
-  /*   /* dispatch(stopScanning()); */
-  /*   stopScanningForPeripherals(); */
-  /* }; */
-
-
   const rotate = spinValue.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -108,42 +85,6 @@ const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
       )
     ).start(() => spinValue.setValue(0));
   }
-
-  /* if (state === states.CONNECTED) { */
-  /*   return ( */
-  /*     <Dialog */
-  /*       style={{ backgroundColor: 'white', borderRadius: 2 }} */
-  /*       visible={visible} */
-  /*       onDismiss={onDismiss} */
-  /*     > */
-  /*       <Dialog.Title> */
-  /*         Configure Your Device */
-  /*       </Dialog.Title> */
-  /*       <Dialog.Content */
-  /*         style={{ */
-  /*           minHeight: 100, */
-  /*           maxHeight: 400, */
-  /*         }} */
-  /*       > */
-  /*         <Text>Connecting to {selectedDevice?.name}</Text> */
-  /*         <Text>Name Your Device</Text> */
-  /**/
-  /*       </Dialog.Content> */
-  /*       <Dialog.Actions> */
-  /*         <Button */
-  /*           mode='contained' */
-  /*           onPress={() => setState(states.CONNECTING)} */
-  /*           disabled={!selectedDevice} */
-  /*           style={{ */
-  /*             padding: 5, */
-  /*           }} */
-  /*         > */
-  /*           Finish */
-  /*         </Button> */
-  /*       </Dialog.Actions> */
-  /*     </Dialog> */
-  /*   ); */
-  /* } */
 
   if (state === states.CONNECTING || state === states.CONNECTED) {
     return (
@@ -173,7 +114,7 @@ const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
         <Dialog.Actions>
           {
             state === states.CONNECTING &&
-              <Button 
+              <Button
                 onPress={hideDialog}
                 background={theme.colors.error}
                 style={{
@@ -228,8 +169,8 @@ const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
               marginEnd: 10,
             }}
           >Searching for Devices </Text>
-          <Animated.View 
-            style={{ 
+          <Animated.View
+            style={{
               transform: [{ rotate }]
             }}>
             <MaterialCommunityIcons
@@ -271,7 +212,7 @@ const ConnectDeviceModal = ({ visible, setVisible, onDismiss}) => {
           </FlatList>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button 
+          <Button
             onPress={hideDialog}
             background={theme.colors.error}
             style={{

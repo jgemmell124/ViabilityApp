@@ -24,10 +24,10 @@ class FileManager {
       if (permissions.granted) {
         const internalFileContents = await FileSystem.readAsStringAsync(internalFilePath);
         await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, exportFileName, mimetype)
-        .then(async (uri) => {
-          await FileSystem.writeAsStringAsync(uri, internalFileContents);
-        })
-        .catch(e => console.log(e));
+          .then(async (uri) => {
+            await FileSystem.writeAsStringAsync(uri, internalFileContents);
+          })
+          .catch(e => console.log(e));
       } else {
         await Sharing.shareAsync(internalFilePath);
       }
@@ -36,7 +36,7 @@ class FileManager {
     }
 
   }
-  
+
   _ensureDirExists(dir) {
     FileSystem.getInfoAsync(dir).then(({ exists }) => {
       if (!exists) {

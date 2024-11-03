@@ -15,11 +15,11 @@ import { useState } from 'react';
 import { selectConnectedDevice } from '../state/store';
 import LogoTitle from '../components/LogoTitle';
 
-import ConnectDeviceModal from '@/components/ConnectDeviceModal';
-import DeviceTemperatureDisplay from '@/components/DeviceTemperatureDisplay';
+import ConnectDeviceModal from '@/components/device/ConnectDeviceModal';
+import DeviceTemperatureDisplay from '@/components/device/DeviceTemperatureDisplay';
 import AlertNotifications from '@/components/AlertNotifications';
-import DeviceTypeDisplay from '@/components/DeviceTypeDisplay';
-import ConnectNewDeviceButton from '@/components/ConnectNewDeviceButton';
+import DeviceTypeDisplay from '@/components/device/DeviceTypeDisplay';
+import ConnectNewDeviceButton from '@/components/device/ConnectNewDeviceButton';
 
 export default function HomeScreen() {
   const [visible, setVisible] = useState(false);
@@ -30,7 +30,7 @@ export default function HomeScreen() {
   const theme = useTheme();
   const styles = makeStyles(theme);
 
-  const bottleImage = Image.resolveAssetSource(require('../assets/images/Metal_BS_Capped.png'));
+  const bottleImage = Image.resolveAssetSource(require('@/assets/images/Metal_BS_Capped.png'));
 
   const HeaderLeftIcon = () => (
     <IconButton

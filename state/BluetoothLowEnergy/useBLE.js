@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Buffer } from 'buffer';
 import {
   BleManager,
 } from 'react-native-ble-plx';
-import * as FileSystem from 'expo-file-system';
 
 import base64 from 'react-native-base64';
 import { useDispatch, useSelector } from 'react-redux';
@@ -104,7 +103,7 @@ function useBLE()  {
 
   const connectToDevice = async (device) => {
     const deviceConnection = await bleManager.connectToDevice(device.id);
-    dispatch(setConnectedDevice({ 
+    dispatch(setConnectedDevice({
       id: deviceConnection.id,
       name: deviceConnection.name,
       friendlyName: deviceConnection.name
@@ -301,22 +300,23 @@ function useBLE()  {
     console.log('subscription remove');
     setDownloadProgress(0);
     return csvFile.toString();
-  }
+  };
 
+  // don't use yet
   const triggerFileTransfer = async () => {
     if (!connectedDevice) {
       console.log('No Device Connected');
       return;
     }
     // do this to retrieve device
-    const device = (await bleManager.readRSSIForDevice(connectedDevice.id))
+    const device = (await bleManager.readRSSIForDevice(connectedDevice.id));
 
     const p = {};
     p.resolve = () => {};
     p.promise = new Promise((resolve, reject) => {
       p.resolve = resolve;
       p.reject = reject;
-    })
+    });
 
     // set up a stream for the file
     const transactionId = 'FILE_DOWNLOAD';
@@ -368,7 +368,7 @@ function useBLE()  {
     stopScanningForPeripherals,
     connectToDevice,
     disconnectFromDevice,
-    triggerFileTransfer,
+    /* triggerFileTransfer, */
     streamFileData,
   };
 }
