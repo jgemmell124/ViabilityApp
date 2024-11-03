@@ -7,14 +7,17 @@
 ######
 build the project
 
-set up SDK
+First you must set up SDK
 install cli tools for android SDK
+(platform-tools, build-tools, cmdline-tools)
+must also add path to .bashrc
 
 
-run npx expo-doctor to update dependencies
+if failing to build, may have to run
+npx expo-doctor to update dependencies
 
 
-start the project
+to start the project
 ```
 $ npx expo start
 ```
