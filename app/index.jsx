@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, {
   StyleSheet,
   View,
@@ -6,51 +5,21 @@ import React, {
 } from 'react-native';
 import { Stack, useNavigation } from 'expo-router';
 import {
-  Button,
   IconButton,
   Text,
   useTheme
 } from 'react-native-paper';
 import _ from 'lodash';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useState } from 'react';
-import { selectConnectedDevice, selectDeviceType, selectDevices, selectUnit } from '../state/store';
+import { selectConnectedDevice } from '../state/store';
 import LogoTitle from '../components/LogoTitle';
 
-import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 import ConnectDeviceModal from '@/components/ConnectDeviceModal';
 import DeviceTemperatureDisplay from '@/components/DeviceTemperatureDisplay';
-import DownloadCSVButton from '@/components/DownloadCSV';
 import AlertNotifications from '@/components/AlertNotifications';
 import DeviceTypeDisplay from '@/components/DeviceTypeDisplay';
-
-
-const ConnectNewDeviceButton = ({ onPress }) => {
-  const theme = useTheme();
-
-  return (
-    <Button
-      mode='elevated'
-      rippleColor={theme.colors.onPrimary}
-      onPress={onPress}
-      labelStyle={{
-        padding: 5,
-        fontSize: 20,
-      }}
-      textColor={theme.colors.onPrimary}
-      style={{
-        backgroundColor: theme.colors.primary,
-        /* padding: 5, */
-      }}
-    >
-      Connect New Device
-    </Button>
-  );
-};
-
-ConnectNewDeviceButton.propTypes = {
-  onPress: PropTypes.func,
-};
+import ConnectNewDeviceButton from '@/components/ConnectNewDeviceButton';
 
 export default function HomeScreen() {
   const [visible, setVisible] = useState(false);
