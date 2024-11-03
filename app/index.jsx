@@ -57,15 +57,11 @@ export default function HomeScreen() {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const devices = useSelector(selectDevices);
   const connectedDevice = useSelector(selectConnectedDevice);
-  const deviceType = useSelector(selectDeviceType);
   const theme = useTheme();
   const styles = makeStyles(theme);
-  const { connectToDevice } = useBLE();
 
-  const bottleImage = Image.resolveAssetSource(require('../assets/images/OceanBottle-no-bg.png'));
+  const bottleImage = Image.resolveAssetSource(require('../assets/images/Metal_BS_Capped.png'));
 
   const HeaderLeftIcon = () => (
     <IconButton
@@ -144,6 +140,7 @@ export default function HomeScreen() {
             style={{
               /* height: '50%', */
               paddingLeft: 15,
+              marginTop: 24,
               alignItems: 'center',
             }}
           >
@@ -151,7 +148,7 @@ export default function HomeScreen() {
               style={{
                 padding: 10,
                 width: 140,
-                height: 324,
+                height: 400,
               }}
               source={{ uri: bottleImage.uri }}
             />
