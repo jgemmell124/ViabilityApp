@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, View } from 'react-native';
-import { Button, Card, Checkbox, Dialog, Menu, Portal, TextInput, useTheme } from 'react-native-paper';
+import { Card, Checkbox, Dialog, Portal, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Text } from 'react-native-paper';
 
@@ -13,7 +13,7 @@ import { setUnitC, setUnitF } from '@/state/Settings/slice';
 
 export default function SettingsScreen() {
   const [visible, setVisible] = useState(false);
-  // TODO redux
+
   const tempUnit = useSelector(selectUnit);
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -122,14 +122,14 @@ export default function SettingsScreen() {
             <Dialog.Content>
               <Checkbox.Item
                 label='Farhenheit (°F)'
-                status={`${tempUnit === 'C' ? 'unchecked' : 'checked'}`} 
+                status={`${tempUnit === 'C' ? 'unchecked' : 'checked'}`}
                 onPress={() => {
                   dispatch(setUnitF());
                   hideDialog();
                 }} />
               <Checkbox.Item
                 label='Celsius (°C)'
-                status={`${tempUnit === 'C' ? 'checked' : 'unchecked'}`} 
+                status={`${tempUnit === 'C' ? 'checked' : 'unchecked'}`}
                 onPress={() => {
                   dispatch(setUnitC());
                   hideDialog();

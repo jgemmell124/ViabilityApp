@@ -6,19 +6,15 @@ import { Text, Button, Card, Dialog, Portal, TextInput, useTheme } from 'react-n
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
+import { Stack, useNavigation } from 'expo-router';
 import { useSelector } from 'react-redux';
-import { selectConnectedDevice, selectDeviceById, selectUnit } from '@/state/store';
+import { selectConnectedDevice, selectUnit } from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
 
 export default function DeviceSettingsScreen() {
-  const { id } = useLocalSearchParams();
-  /* const dispatch = useDispatch(); */
   const { disconnectFromDevice } = useBLE();
   const navigation = useNavigation();
 
-  // TODO get device by id when supporting multiple devices
-  /* const device = useSelector(selectDeviceById(id)); */
   const device = useSelector(selectConnectedDevice);
   const unitTemp = useSelector(selectUnit);
 
@@ -31,7 +27,6 @@ export default function DeviceSettingsScreen() {
   const hideDialog = () => setVisible(false);
 
   const onDelete = () => {
-    /* dispatch(disconnectFromDevice(device)); */
     disconnectFromDevice(device?.id).then(
       () => navigation.navigate('index')
     );

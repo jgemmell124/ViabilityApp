@@ -1,17 +1,39 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import Separator from '../components/Seperator';
-import { Text, Button, Card, Dialog, Portal, TextInput, useTheme, Checkbox } from 'react-native-paper';
-
+import {
+  Text,
+  Button,
+  Card,
+  useTheme,
+} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { Stack, useNavigation } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectConnectedDevice, selectDeviceById, selectDeviceType, selectMaxTemp, selectMinTemp, selectUnit } from '@/state/store';
+import {
+  selectConnectedDevice,
+  selectDeviceType,
+  selectMaxTemp,
+  selectMinTemp,
+  selectUnit,
+} from '@/state/store';
 import useBLE from '@/state/BluetoothLowEnergy/useBLE';
+
 import { setConnectedDevice } from '@/state/BluetoothLowEnergy/slice';
-import { setDeviceType, setMaxTempC, setMinTempC } from '@/state/Settings/slice';
+
+import {
+  setDeviceType,
+  setMaxTempC,
+  setMinTempC,
+} from '@/state/Settings/slice';
+
+import DeviceSettingsDialog from '@/components/device/DeviceSettingsDialog';
 
 const deviceTypes = ['Insulin Pen', 'Insulin Vial', 'Insulin Cartridge'];
 
@@ -20,13 +42,10 @@ const CtoF = (c) => preciseNumber(c * 9 / 5 + 32);
 const FtoC = (f) => ((f - 32) * 5 / 9);
 
 export default function DeviceSettingsScreen() {
-  /* const dispatch = useDispatch(); */
   const { disconnectFromDevice } = useBLE();
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  // TODO get device by id when supporting multiple devices
-  /* const device = useSelector(selectDeviceById(id)); */
   const connectedDevice = useSelector(selectConnectedDevice);
   const unitTemp = useSelector(selectUnit);
   const deviceType = useSelector(selectDeviceType);
@@ -35,13 +54,12 @@ export default function DeviceSettingsScreen() {
   const styles = makeStyles(theme);
 
   const [visible, setVisible] = useState(false);
-  const [selectedField, setSelectedField] = useState();
+  const [selectedField, setSelectedField] = useState({});
 
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
   const onDelete = () => {
-    /* dispatch(disconnectFromDevice(device)); */
     disconnectFromDevice(connectedDevice?.id).then(
       () => navigation.navigate('index')
     );
@@ -177,77 +195,12 @@ export default function DeviceSettingsScreen() {
         </Card>
       </View>
       <View>
-        <Portal>
-          <Dialog
-            style={{ backgroundColor: 'white', borderRadius: 2 }}
-            visible={visible}
-            onDismiss={hideDialog}
-          >
-            <Dialog.Title>Edit {selectedField?.name}</Dialog.Title>
-            <Dialog.Content>
-              {
-                selectedField?.type === 'enum' &&
-                  selectedField.options?.map((option, index) => (
-                    <Checkbox.Item
-                      key={index}
-                      label={option}
-                      status={`${deviceType === option ? 'checked' : 'unchecked'}`}
-                      onPress={() => {
-                        selectedField.handler(option);
-                        hideDialog();
-                      }} />
-
-                  ))
-              }
-              {
-                selectedField?.type === 'text' &&
-                  <TextInput
-                    inputMode={selectedField?.type}
-                    mode='outlined'
-                    autoFocus
-                    onChangeText={(value) => setSelectedField({ ...selectedField, value })}
-                    value={selectedField?.value}
-                  />
-              }
-              {
-                selectedField?.type === 'numeric' &&
-                  <TextInput
-                    inputMode={selectedField?.type}
-                    mode='outlined'
-                    autoFocus
-                    keyboardType='numeric'
-                    onChangeText={(value) => setSelectedField({ ...selectedField, value })}
-                    value={selectedField?.value ?? 0}
-                  />
-              }
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button
-                mode='outlined'
-                onPress={hideDialog}
-                style={{
-                  paddingLeft: 5,
-                  paddingRight: 5,
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                mode='contained'
-                onPress={() => {
-                  selectedField.handler(selectedField.value);
-                  hideDialog();
-                }}
-                style={{
-                  paddingLeft: 5,
-                  paddingRight: 5,
-                }}
-              >
-                Save
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
+        <DeviceSettingsDialog
+          selectedField={selectedField}
+          setSelectedField={setSelectedField}
+          visible={visible}
+          hideDialog={hideDialog}
+        />
       </View>
       <Button
         mode='contained-tonal'
