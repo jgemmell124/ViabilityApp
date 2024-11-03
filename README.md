@@ -7,13 +7,19 @@
 ######
 build the project
 
+set up SDK
+install cli tools for android SDK
+
+
+run npx expo-doctor to update dependencies
+
 
 start the project
 ```
 $ npx expo start
 ```
 to clear cache and start
-``` 
+```
 $ npx expo start --clear
 ```
 then make sure it is in development mode
